@@ -16,6 +16,10 @@ import {
 } from "@/components/storefront/brand-system";
 import { getProducts, getCategories } from "@/features/catalog/queries";
 
+// Type inferred from query return
+type Category = Awaited<ReturnType<typeof getCategories>>[number];
+type Product = Awaited<ReturnType<typeof getProducts>>[number];
+
 const reasons = [
   {
     icon: Heart,
@@ -38,15 +42,15 @@ const reasons = [
 
 export default async function PersonalizedGiftsPage() {
   const [categories, products] = await Promise.all([
-    getCategories().catch(() => []),
-    getProducts({ limit: 8 }).catch(() => []),
+    getCategories().catch(() => [] as Category[]),
+    getProducts({ limit: 8 }).catch(() => [] as Product[]),
   ]);
 
-  const parentCategory = categories.find(c => c.slug === 'personalized-gifts');
+  const parentCategory = categories.find((c: Category) => c.slug === 'personalized-gifts');
   
   const personalizedCategories = categories
-    .filter(c => c.parentId === parentCategory?.id)
-    .map(c => ({
+    .filter((c: Category) => c.parentId === parentCategory?.id)
+    .map((c: Category) => ({
       title: c.name,
       description: c.description || "",
       image: c.image || "/images/fnp/products/mugs.png",
@@ -151,7 +155,7 @@ export default async function PersonalizedGiftsPage() {
               description="These categories cover the most practical custom gift routes while keeping the finished result visually strong."
             />
             <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {personalizedCategories.map((item) => (
+              {personalizedCategories.map((item: typeof personalizedCategories[number]) => (
                 <BrandVisualCard key={item.title} {...item} />
               ))}
             </div>
