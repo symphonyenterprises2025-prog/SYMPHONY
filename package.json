@@ -1,0 +1,26 @@
+{
+  "name": "ecommerce-symphony",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "turbo run format",
+    "db:generate": "cd prisma && pnpm prisma generate",
+    "db:migrate": "cd prisma && pnpm prisma migrate dev",
+    "db:seed": "cd prisma && pnpm prisma db seed",
+    "db:studio": "cd prisma && pnpm prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

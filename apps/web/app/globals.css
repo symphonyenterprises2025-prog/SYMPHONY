@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 20% 98%;
+    --foreground: 220 20% 15%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+    
+    --primary: 45 90% 50%;
+    --primary-foreground: 220 20% 15%;
+    
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 220 20% 15%;
+    
+    --muted: 220 20% 95%;
+    --muted-foreground: 220 15% 45%;
+    
+    --accent: 45 90% 50%;
+    --accent-foreground: 220 20% 15%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
+    --ring: 45 90% 50%;
+    
+    --radius: 0.75rem;
+  }
+  
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 250 20% 98%;
+    
+    --card: 220 20% 15%;
+    --card-foreground: 250 20% 98%;
+    
+    --popover: 220 20% 15%;
+    --popover-foreground: 250 20% 98%;
+    
+    --primary: 45 90% 50%;
+    --primary-foreground: 220 20% 15%;
+    
+    --secondary: 220 20% 20%;
+    --secondary-foreground: 250 20% 98%;
+    
+    --muted: 220 20% 20%;
+    --muted-foreground: 250 15% 60%;
+    
+    --accent: 45 90% 50%;
+    --accent-foreground: 220 20% 15%;
+    
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 20% 25%;
+    --input: 220 20% 25%;
+    --ring: 45 90% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .texture-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent;
+  }
+  
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl;
+  }
+  
+  .premium-shadow {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+  }
+}
+
+/* Animation Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes carousel {
+  0%, 11.5% {
+    opacity: 1;
+    z-index: 10;
+  }
+  12.5%, 100% {
+    opacity: 0;
+    z-index: 0;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-amber-600 text-white hover:from-amber-600 hover:to-primary transition-all duration-300 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-foreground border-2 border-primary hover:bg-primary hover:text-white transition-all duration-300;
+  }
+  
+  .section-container {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .section-padding {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+}

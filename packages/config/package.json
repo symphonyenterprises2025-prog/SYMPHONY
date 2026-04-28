@@ -1,0 +1,16 @@
+{
+  "name": "@symphony/config",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,md}\""
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0"
+  }
+}
