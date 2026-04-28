@@ -53,7 +53,7 @@ export default async function BlogPage() {
               description="The content here is built to help customers, teams, and event planners make more confident choices about products, presentation, and customization."
             />
             <div className="mt-8 grid gap-6 lg:grid-cols-2">
-              {blogPosts.map((post, index) => (
+              {blogPosts.map((post: typeof blogPosts[number], index) => (
                 <Link
                   key={post.slug}
                   href={`/blog/${post.slug}`}
