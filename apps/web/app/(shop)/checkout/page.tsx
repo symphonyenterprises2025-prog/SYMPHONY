@@ -66,7 +66,7 @@ export default function CheckoutPage() {
     }
   }
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((acc: number, item: CartItem) => acc + item.price * item.quantity, 0);
   const shipping = subtotal > 999 ? 0 : 99;
   const giftWrapping = 99;
   const tax = Math.round(subtotal * 0.09); // 9% tax

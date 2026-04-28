@@ -105,7 +105,7 @@ export default function CartPage() {
     }
   }
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((acc: number, item: CartItem) => acc + item.price * item.quantity, 0);
   const shipping = subtotal > 999 ? 0 : 99;
   const total = subtotal + shipping - discountAmount;
 

@@ -165,14 +165,14 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Total Spent</span>
                 <span className="font-bold text-2xl">
-                  ₹{customer.orders.reduce((sum, order) => sum + Number(order.total), 0).toFixed(2)}
+                  ₹{customer.orders.reduce((sum: number, order: typeof customer.orders[number]) => sum + Number(order.total), 0).toFixed(2)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Average Order</span>
                 <span className="font-bold text-2xl">
                   ₹{customer.orders.length > 0 
-                    ? (customer.orders.reduce((sum, order) => sum + Number(order.total), 0) / customer.orders.length).toFixed(2)
+                    ? (customer.orders.reduce((sum: number, order: typeof customer.orders[number]) => sum + Number(order.total), 0) / customer.orders.length).toFixed(2)
                     : '0.00'}
                 </span>
               </div>
