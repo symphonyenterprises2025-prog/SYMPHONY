@@ -11,10 +11,13 @@ import {
 } from "@/components/storefront/brand-system";
 import { getOccasions } from "@/features/catalog/queries";
 
-export default async function OccasionsPage() {
-  const occasions = await getOccasions().catch(() => []);
+// Type inferred from query return
+type Occasion = Awaited<ReturnType<typeof getOccasions>>[number];
 
-  const occasionCards = occasions.map((occasion) => ({
+export default async function OccasionsPage() {
+  const occasions = await getOccasions().catch(() => [] as Occasion[]);
+
+  const occasionCards = occasions.map((occasion: Occasion) => ({
     title: occasion.name,
     description: occasion.description || "",
     image: "/images/fnp/products/gift01.webp",
@@ -56,7 +59,7 @@ export default async function OccasionsPage() {
               description="Each occasion page is a faster route into the kinds of products and presentation styles customers actually expect for that moment."
             />
             <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {occasionCards.map((occasion) => (
+              {occasionCards.map((occasion: typeof occasionCards[number]) => (
                 <BrandVisualCard key={occasion.title} {...occasion} className="h-full" />
               ))}
             </div>
