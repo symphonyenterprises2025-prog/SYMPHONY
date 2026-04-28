@@ -12,11 +12,12 @@ import {
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
 import { getBlogPosts } from "@/features/catalog/queries";
+import { BlogPost } from "@prisma/client";
 
 export default async function BlogPage() {
-  const posts = await getBlogPosts().catch(() => []);
+  const posts: BlogPost[] = await getBlogPosts().catch(() => []);
 
-  const blogPosts = posts.map((post) => ({
+  const blogPosts = posts.map((post: BlogPost) => ({
     title: post.title,
     excerpt: post.excerpt || "",
     image: post.coverImage || "/images/fnp/products/gift01.webp",

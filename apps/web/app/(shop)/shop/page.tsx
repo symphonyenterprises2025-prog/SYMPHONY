@@ -48,7 +48,7 @@ export default async function ShopPage(props: {
 
   const { products, total, totalPages } = paginatedData;
 
-  const productCards = products.map((product: any, index: number) => ({
+  const productCards = products.map((product, index) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
     image: product.images[0]?.url || "/images/fnp/products/mugs.png",
@@ -56,7 +56,7 @@ export default async function ShopPage(props: {
     label: index === 0 && !categorySlug && !searchQuery && currentPage === 1 ? "Featured" : undefined,
   }));
 
-  const categoryCards = categories.slice(0, 4).map((category: any) => ({
+  const categoryCards = categories.slice(0, 4).map((category) => ({
     title: category.name,
     description: category.description,
     image: category.image || "/images/fnp/products/mugs.png",
