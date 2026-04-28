@@ -116,7 +116,7 @@ export function AccountContent() {
               </Button>
             </div>
             <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {menuItems.map((item) => (
+              {menuItems.map((item: MenuItem) => (
                 <Link key={item.href} href={item.href} className="group overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_24px_60px_rgba(45,36,20,0.1)] transition-transform duration-300 hover:-translate-y-1">
                   <div className="flex items-start justify-between">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1f3763] to-[#2b8b68] text-white"><item.icon className="h-6 w-6" /></div>
@@ -134,7 +134,7 @@ export function AccountContent() {
               </div>
               <div className="mt-6 space-y-4">
                 {recentOrders.length > 0 ? (
-                  recentOrders.map((order) => (
+                  recentOrders.map((order: typeof recentOrders[number]) => (
                     <div key={order.id} className="flex items-center justify-between rounded-[1.4rem] border border-[#eadfca] bg-[#fbf8f1] p-4">
                       <div><p className="font-sans text-base font-semibold text-slate-950">{order.orderNumber}</p><p className="mt-1 text-sm text-slate-500">{new Date(order.createdAt).toLocaleDateString()}</p></div>
                       <div className="text-right"><p className="font-sans text-base font-semibold text-slate-950">₹{order.total}</p><p className="mt-1 text-sm font-semibold text-[#1f7a57]">{order.status}</p></div>

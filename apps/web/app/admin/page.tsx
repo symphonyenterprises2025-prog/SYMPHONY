@@ -53,8 +53,8 @@ export default async function AdminDashboard() {
   }
 
   // Fetch recent activity
-  let recentOrders: any[] = [];
-  let recentCustomers: any[] = [];
+  let recentOrders: { orderNumber: string; customerName: string; status: string; createdAt: Date }[] = [];
+  let recentCustomers: { name: string | null; email: string; createdAt: Date }[] = [];
   
   try {
     recentOrders = await prisma.order.findMany({
@@ -105,7 +105,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {stats.map((stat) => (
+        {stats.map((stat: typeof stats[number]) => (
           <Link
             key={stat.title}
             href={stat.href}
@@ -149,7 +149,7 @@ export default async function AdminDashboard() {
           </div>
           <div className="space-y-3">
             {recentOrders.length > 0 ? (
-              recentOrders.map((order) => (
+              recentOrders.map((order: typeof recentOrders[number]) => (
                 <div key={order.orderNumber} className="flex items-center justify-between border-b pb-2">
                   <span className="text-sm text-muted-foreground">
                     Order {order.orderNumber} by {order.customerName}
@@ -164,7 +164,7 @@ export default async function AdminDashboard() {
             )}
             {recentCustomers.length > 0 && (
               <>
-                {recentCustomers.map((customer) => (
+                {recentCustomers.map((customer: typeof recentCustomers[number]) => (
                   <div key={customer.email} className="flex items-center justify-between border-b pb-2">
                     <span className="text-sm text-muted-foreground">
                       New customer: {customer.name}

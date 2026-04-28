@@ -66,7 +66,7 @@ export function AddressesContent() {
               </div>
             )}
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
-              {addresses.map((address) => (
+              {addresses.map((address: typeof addresses[number]) => (
                 <div key={address.id} className="overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">

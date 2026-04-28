@@ -71,7 +71,7 @@ export function WishlistContent() {
               </div>
             </div>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {wishlistItems.map((item) => (
+              {wishlistItems.map((item: WishlistItem) => (
                 <div key={item.id} className="overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
                   <div className="relative aspect-square overflow-hidden bg-[#f7f2e8]">
                     <Image 

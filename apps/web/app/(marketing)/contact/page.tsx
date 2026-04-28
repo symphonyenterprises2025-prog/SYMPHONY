@@ -114,7 +114,7 @@ export default function ContactPage() {
           </div>
 
           <section className="mt-10 grid gap-5 md:grid-cols-3">
-            {contactCards.map((card) => (
+            {contactCards.map((card: typeof contactCards[number]) => (
               <BrandInfoCard key={card.title} {...card} />
             ))}
           </section>

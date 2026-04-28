@@ -44,7 +44,7 @@ export default async function AdminCustomersPage() {
                   </td>
                 </tr>
               ) : (
-                customers.map((customer) => (
+                customers.map((customer: typeof customers[number]) => (
                   <tr key={customer.id} className="border-b">
                     <td className="px-4 py-4 font-medium">{customer.name || "N/A"}</td>
                     <td className="px-4 py-4 text-muted-foreground">{customer.email}</td>

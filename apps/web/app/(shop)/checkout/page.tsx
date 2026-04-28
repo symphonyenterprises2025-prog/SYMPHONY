@@ -99,7 +99,7 @@ export default function CheckoutPage() {
       customerEmail: formData.email,
       customerName: `${formData.firstName} ${formData.lastName}`,
       customerPhone: formData.phone,
-      items: cartItems.map((item) => ({
+      items: cartItems.map((item: CartItem) => ({
         productId: item.productId,
         variantId: item.variantId,
         productName: item.name,
@@ -371,7 +371,7 @@ export default function CheckoutPage() {
                     { label: "UPI", detail: "Google Pay, PhonePe, Paytm", active: true },
                     { label: "Credit or Debit Card", detail: "Visa, Mastercard, RuPay" },
                     { label: "Cash on Delivery", detail: "For eligible orders and locations" },
-                  ].map((method) => (
+                  ].map((method: { label: string; detail: string; active?: boolean }) => (
                     <div
                       key={method.label}
                       className={`rounded-[1.4rem] border p-4 ${method.active ? "border-[#c59a46] bg-[#f8f2e5]" : "border-[#eadfca] bg-white"}`}
@@ -398,7 +398,7 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="mt-6 space-y-3 font-sans text-[0.98rem] text-slate-600">
                   {cartItems.length > 0 ? (
-                    cartItems.map((item) => (
+                    cartItems.map((item: CartItem) => (
                       <div key={item.id} className="flex items-center justify-between">
                         <span>{item.name} x {item.quantity}</span>
                         <span className="font-semibold text-slate-950">₹{item.price * item.quantity}</span>

@@ -108,7 +108,7 @@ export default async function PersonalizedGiftsPage() {
                 description="The best custom gifts are not just about adding a name. They need the right format, the right finish, and enough restraint to still look elegant."
               />
               <div className="mt-8 grid gap-5">
-                {reasons.map((reason) => (
+                {reasons.map((reason: typeof reasons[number]) => (
                   <BrandInfoCard key={reason.title} {...reason} />
                 ))}
               </div>
@@ -134,7 +134,7 @@ export default async function PersonalizedGiftsPage() {
                       "Thank You gifts",
                       "Photo keepsakes",
                       "Recognition pieces",
-                    ].map((item) => (
+                    ].map((item: string) => (
                       <span
                         key={item}
                         className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur"

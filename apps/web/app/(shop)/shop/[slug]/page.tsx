@@ -320,7 +320,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   Typical add-ons
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  {["Names", "Logos", "Message cards", "Gift boxing", "Engraving"].map((item) => (
+                  {["Names", "Logos", "Message cards", "Gift boxing", "Engraving"].map((item: string) => (
                     <span
                       key={item}
                       className="rounded-full border border-[#eadfca] bg-[#fbf8f1] px-4 py-2 text-sm font-medium text-slate-700"

@@ -121,7 +121,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {order.items.map((item) => (
+                {order.items.map((item: typeof order.items[number]) => (
                   <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                     <div className="flex-1">
                       <p className="font-medium">{item.productName}</p>

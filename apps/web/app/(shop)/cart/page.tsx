@@ -69,7 +69,7 @@ export default function CartPage() {
       });
       if (res.ok) {
         setCartItems((prev) =>
-          prev.map((item) =>
+          prev.map((item: CartItem) =>
             item.id === itemId ? { ...item, quantity: newQuantity } : item
           )
         );
@@ -86,7 +86,7 @@ export default function CartPage() {
     try {
       const res = await fetch(`/api/cart/${itemId}`, { method: "DELETE" });
       if (res.ok) {
-        setCartItems((prev) => prev.filter((item) => item.id !== itemId));
+        setCartItems((prev) => prev.filter((item: CartItem) => item.id !== itemId));
       }
     } catch (err) {
       console.error("Failed to remove item:", err);
@@ -151,7 +151,7 @@ export default function CartPage() {
                   <span className="text-right">Total</span>
                 </div>
                 <div className="mt-6 space-y-6">
-                  {cartItems.map((item) => (
+                  {cartItems.map((item: CartItem) => (
                     <div
                       key={item.id}
                       className="grid gap-4 border-b border-[#efe4d1] pb-6 last:border-0 last:pb-0 lg:grid-cols-[1.4fr_0.35fr_0.35fr]"

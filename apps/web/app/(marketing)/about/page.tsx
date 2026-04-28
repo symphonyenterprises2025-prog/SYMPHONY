@@ -196,7 +196,7 @@ export default function AboutPage() {
               align="center"
             />
             <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {values.map((item) => (
+              {values.map((item: typeof values[number]) => (
                 <BrandInfoCard key={item.title} {...item} />
               ))}
             </div>
@@ -210,7 +210,7 @@ export default function AboutPage() {
               align="center"
             />
             <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {showcase.map((item) => (
+              {showcase.map((item: typeof showcase[number]) => (
                 <BrandVisualCard key={item.title} {...item} />
               ))}
             </div>

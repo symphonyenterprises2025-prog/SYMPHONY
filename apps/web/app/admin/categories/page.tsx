@@ -51,7 +51,7 @@ export default async function AdminCategoriesPage() {
                   </td>
                 </tr>
               ) : (
-                categories.map((category) => (
+                categories.map((category: typeof categories[number]) => (
                   <tr key={category.id} className="border-b">
                     <td className="px-4 py-4 font-medium">{category.name}</td>
                     <td className="px-4 py-4">

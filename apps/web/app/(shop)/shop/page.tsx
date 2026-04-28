@@ -277,7 +277,7 @@ export default async function ShopPage(props: {
                     )}
                     
                     <div className="flex items-center gap-1 mx-2">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page: number) => {
                         // Show current page, first, last, and pages adjacent to current
                         if (
                           page === 1 ||

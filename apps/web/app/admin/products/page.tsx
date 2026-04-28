@@ -52,7 +52,7 @@ export default async function AdminProductsPage() {
                   </td>
                 </tr>
               ) : (
-                products.map((product) => (
+                products.map((product: typeof products[number]) => (
                   <tr key={product.id} className="border-b">
                     <td className="px-4 py-4 font-medium">{product.name}</td>
                     <td className="px-4 py-4 text-muted-foreground">{product.category?.name || "Uncategorized"}</td>

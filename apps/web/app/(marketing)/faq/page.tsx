@@ -107,7 +107,7 @@ export default function FAQPage() {
               description="If the answer you need is not here, the fastest route is still direct contact with your product details and timeline."
             />
             <div className="mt-8 space-y-8">
-              {faqs.map((section) => (
+              {faqs.map((section: typeof faqs[number]) => (
                 <div
                   key={section.category}
                   className="rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_24px_60px_rgba(45,36,20,0.1)] sm:p-8"
@@ -155,7 +155,7 @@ export default function FAQPage() {
                     "Artwork proofs",
                     "Delivery questions",
                     "Gift customization",
-                  ].map((item) => (
+                  ].map((item: string) => (
                     <span
                       key={item}
                       className="rounded-full border border-[#eadfca] bg-[#fbf8f1] px-4 py-2 text-sm font-medium text-slate-700"

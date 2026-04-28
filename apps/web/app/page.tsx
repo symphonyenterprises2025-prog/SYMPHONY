@@ -12,20 +12,23 @@ import {
 } from "@/components/storefront/brand-system";
 import { getProducts, getCollections } from "@/features/catalog/queries";
 
+type ProductWithRelations = Awaited<ReturnType<typeof getProducts>>[number];
+type Collection = Awaited<ReturnType<typeof getCollections>>[number];
+
 export default async function HomePage() {
   const [products, collections] = await Promise.all([
-    getProducts({ limit: 8 }).catch(() => []),
-    getCollections().catch(() => []),
+    getProducts({ limit: 8 }).catch(() => [] as ProductWithRelations[]),
+    getCollections().catch(() => [] as Collection[]),
   ]);
 
-  const productCards = products.slice(0, 8).map((product) => ({
+  const productCards = products.slice(0, 8).map((product: ProductWithRelations) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
     image: product.images[0]?.url || "/images/fnp/products/gift01.webp",
     href: `/shop/${product.slug}`,
   }));
 
-  const collectionCards = collections.slice(0, 4).map((collection) => ({
+  const collectionCards = collections.slice(0, 4).map((collection: Collection) => ({
     title: collection.name,
     description: collection.description,
     image: "/images/fnp/products/gift01.webp",
@@ -78,7 +81,7 @@ export default async function HomePage() {
               description="Handpicked favorites that customers keep coming back for. Quality guaranteed with every purchase."
             />
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {productCards.map((product) => (
+              {productCards.map((product: typeof productCards[number]) => (
                 <BrandProductCard key={`${product.name}-${product.href}`} {...product} />
               ))}
             </div>

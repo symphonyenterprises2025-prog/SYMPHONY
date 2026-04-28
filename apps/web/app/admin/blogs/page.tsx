@@ -51,7 +51,7 @@ export default async function AdminBlogsPage() {
                   </td>
                 </tr>
               ) : (
-                blogs.map((blog) => (
+                blogs.map((blog: typeof blogs[number]) => (
                   <tr key={blog.id} className="border-b">
                     <td className="px-4 py-4 font-medium">{blog.title}</td>
                     <td className="px-4 py-4 text-muted-foreground">{blog.author || "Anonymous"}</td>

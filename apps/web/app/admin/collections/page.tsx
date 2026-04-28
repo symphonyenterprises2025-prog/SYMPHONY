@@ -51,7 +51,7 @@ export default async function AdminCollectionsPage() {
                   </td>
                 </tr>
               ) : (
-                collections.map((collection) => (
+                collections.map((collection: typeof collections[number]) => (
                   <tr key={collection.id} className="border-b">
                     <td className="px-4 py-4 font-medium">{collection.name}</td>
                     <td className="px-4 py-4">

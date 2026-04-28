@@ -83,7 +83,7 @@ export function OrdersContent() {
               </div>
             </div>
             <div className="mt-8 space-y-5">
-              {orders.map((order) => (
+              {orders.map((order: Order) => (
                 <div key={order.id} className="overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>

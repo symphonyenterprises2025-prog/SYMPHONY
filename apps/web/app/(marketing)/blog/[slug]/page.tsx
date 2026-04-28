@@ -63,7 +63,7 @@ export default function BlogDetailPage() {
               </div>
 
               <div className="mt-8 space-y-6 font-sans text-[1.04rem] leading-8 text-slate-600">
-                {post.content.map((paragraph) => (
+                {post.content.map((paragraph: string) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
@@ -75,7 +75,7 @@ export default function BlogDetailPage() {
                     Share this article
                   </h2>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    {["Facebook", "WhatsApp", "Instagram"].map((item) => (
+                    {["Facebook", "WhatsApp", "Instagram"].map((item: string) => (
                       <span
                         key={item}
                         className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-sm font-medium text-slate-700"

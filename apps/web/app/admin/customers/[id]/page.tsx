@@ -97,7 +97,7 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
             <CardContent>
               {customer.addresses.length > 0 ? (
                 <div className="space-y-4">
-                  {customer.addresses.map((address) => (
+                  {customer.addresses.map((address: typeof customer.addresses[number]) => (
                     <div key={address.id} className="p-4 bg-slate-50 rounded-lg">
                       <div className="flex items-start justify-between mb-2">
                         <p className="font-medium">{address.firstName} {address.lastName}</p>
@@ -131,7 +131,7 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
             <CardContent>
               {customer.orders.length > 0 ? (
                 <div className="space-y-4">
-                  {customer.orders.map((order) => (
+                  {customer.orders.map((order: typeof customer.orders[number]) => (
                     <div key={order.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                       <div>
                         <p className="font-medium">{order.orderNumber}</p>

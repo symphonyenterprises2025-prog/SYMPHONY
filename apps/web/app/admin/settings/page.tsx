@@ -47,7 +47,7 @@ export default async function AdminSettingsPage() {
 
   const settings = await prisma.storeSetting.findMany();
 
-  const getSetting = (key: string) => settings.find((s) => s.key === key)?.value || "";
+  const getSetting = (key: string) => settings.find((s: typeof settings[number]) => s.key === key)?.value || "";
 
   return (
     <div className="space-y-6">

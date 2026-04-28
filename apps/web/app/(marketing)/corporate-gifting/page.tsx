@@ -142,7 +142,7 @@ export default function CorporateGiftingPage() {
           </section>
 
           <section className="mt-10 grid gap-5 md:grid-cols-3">
-            {serviceCards.map((item) => (
+            {serviceCards.map((item: typeof serviceCards[number]) => (
               <BrandInfoCard key={item.title} {...item} />
             ))}
           </section>
@@ -217,7 +217,7 @@ export default function CorporateGiftingPage() {
                     "Client outreach",
                     "Partner gifting",
                     "Leadership gifts",
-                  ].map((item) => (
+                  ].map((item: string) => (
                     <span
                       key={item}
                       className="rounded-full border border-[#eadfca] bg-[#fbf8f1] px-4 py-2 text-sm font-medium text-slate-700"
@@ -238,7 +238,7 @@ export default function CorporateGiftingPage() {
               align="center"
             />
             <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {useCases.map((item) => (
+              {useCases.map((item: typeof useCases[number]) => (
                 <BrandVisualCard key={item.title} {...item} />
               ))}
             </div>
@@ -251,7 +251,7 @@ export default function CorporateGiftingPage() {
               align="center"
             />
             <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {process.map((item) => (
+              {process.map((item: typeof process[number]) => (
                 <BrandInfoCard key={item.title} {...item} />
               ))}
             </div>

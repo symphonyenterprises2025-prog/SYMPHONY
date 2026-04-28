@@ -43,7 +43,7 @@ export default async function AdminOrdersPage() {
                   </td>
                 </tr>
               ) : (
-                orders.map((order) => (
+                orders.map((order: typeof orders[number]) => (
                   <tr key={order.id} className="border-b">
                     <td className="px-4 py-4 font-medium">{order.orderNumber}</td>
                     <td className="px-4 py-4 text-muted-foreground">{order.customerName}</td>

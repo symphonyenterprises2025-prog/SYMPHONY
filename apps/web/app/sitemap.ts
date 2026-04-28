@@ -75,7 +75,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true, updatedAt: true },
     })
 
-    productPages = products.map((product) => ({
+    productPages = products.map((product: typeof products[number]) => ({
       url: `${baseUrl}/shop/${product.slug}`,
       lastModified: product.updatedAt,
       changeFrequency: 'weekly' as const,
@@ -88,7 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true, updatedAt: true },
     })
 
-    blogPages = blogPosts.map((post) => ({
+    blogPages = blogPosts.map((post: typeof blogPosts[number]) => ({
       url: `${baseUrl}/blog/${post.slug}`,
       lastModified: post.updatedAt,
       changeFrequency: 'weekly' as const,
@@ -101,7 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true, updatedAt: true },
     })
 
-    collectionPages = collections.map((collection) => ({
+    collectionPages = collections.map((collection: typeof collections[number]) => ({
       url: `${baseUrl}/collections/${collection.slug}`,
       lastModified: collection.updatedAt,
       changeFrequency: 'weekly' as const,
@@ -114,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true, updatedAt: true },
     })
 
-    occasionPages = occasions.map((occasion) => ({
+    occasionPages = occasions.map((occasion: typeof occasions[number]) => ({
       url: `${baseUrl}/occasions/${occasion.slug}`,
       lastModified: occasion.updatedAt,
       changeFrequency: 'weekly' as const,

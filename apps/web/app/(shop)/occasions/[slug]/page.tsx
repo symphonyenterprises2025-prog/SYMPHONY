@@ -99,7 +99,7 @@ export default function OccasionDetailPage() {
               description="The selection balances quick personal gifts with higher-impact presentation pieces for milestone birthdays."
             />
             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {products.map((product) => (
+              {products.map((product: typeof products[number]) => (
                 <BrandProductCard key={product.name} {...product} />
               ))}
             </div>
