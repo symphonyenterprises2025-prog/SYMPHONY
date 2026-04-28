@@ -11,10 +11,13 @@ import {
 } from "@/components/storefront/brand-system";
 import { getCollections } from "@/features/catalog/queries";
 
-export default async function CollectionsPage() {
-  const collections = await getCollections().catch(() => []);
+// Type inferred from query return
+type Collection = Awaited<ReturnType<typeof getCollections>>[number];
 
-  const collectionCards = collections.map((collection) => ({
+export default async function CollectionsPage() {
+  const collections = await getCollections().catch(() => [] as Collection[]);
+
+  const collectionCards = collections.map((collection: Collection) => ({
     title: collection.name,
     description: collection.description || "",
     image: "/images/fnp/products/gift01.webp",
@@ -56,7 +59,7 @@ export default async function CollectionsPage() {
               description="Not by SKU first, but by gifting intent: festive, personalized, corporate, recognition, or memory-led gifting."
             />
             <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {collectionCards.map((collection) => (
+              {collectionCards.map((collection: typeof collectionCards[number]) => (
                 <BrandVisualCard key={collection.title} {...collection} className="h-full" />
               ))}
             </div>
