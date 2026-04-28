@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 interface MenuItem {
   title: string;
   description: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   href: string;
   count: number | null;
 }
@@ -27,12 +27,12 @@ interface Order {
   total: number;
 }
 
-const menuItemsBase = [
-  { title: "My Orders", description: "View your order history and track shipments", icon: Package, href: "/account/orders" },
-  { title: "Wishlist", description: "View items you've saved for later", icon: Heart, href: "/account/wishlist" },
-  { title: "Addresses", description: "Manage your shipping addresses", icon: MapPin, href: "/account/addresses" },
-  { title: "Profile", description: "Update your personal information", icon: User, href: "/account/profile" },
-  { title: "Settings", description: "Account preferences and notifications", icon: Settings, href: "/account/settings" },
+const menuItemsBase: MenuItem[] = [
+  { title: "My Orders", description: "View your order history and track shipments", icon: Package, href: "/account/orders", count: null },
+  { title: "Wishlist", description: "View items you've saved for later", icon: Heart, href: "/account/wishlist", count: null },
+  { title: "Addresses", description: "Manage your shipping addresses", icon: MapPin, href: "/account/addresses", count: null },
+  { title: "Profile", description: "Update your personal information", icon: User, href: "/account/profile", count: null },
+  { title: "Settings", description: "Account preferences and notifications", icon: Settings, href: "/account/settings", count: null },
 ];
 
 export function AccountContent() {
