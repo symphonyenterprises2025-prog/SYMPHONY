@@ -188,7 +188,7 @@ export default function ContactPage() {
                   <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
                   <h3 className="mt-4 text-lg font-semibold text-green-900">Thank You!</h3>
                   <p className="mt-2 text-green-700">
-                    Your inquiry has been sent successfully. We'll get back to you within 24 hours.
+                    Your inquiry has been sent successfully. We&apos;ll get back to you within 24 hours.
                   </p>
                   <Button
                     onClick={() => setSuccess(false)}

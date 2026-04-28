@@ -188,7 +188,7 @@ export default function RegisterPage() {
                   Verify Your Email
                 </h2>
                 <p className="mt-2 font-sans text-[1rem] text-slate-600">
-                  We've sent a 6-digit verification code to
+                  We&apos;ve sent a 6-digit verification code to
                   <br />
                   <strong className="text-[#1f3763]">{registrationData?.email}</strong>
                 </p>
@@ -225,7 +225,7 @@ export default function RegisterPage() {
               </Button>
 
               <p className="mt-6 text-center text-sm text-slate-600">
-                Didn't receive the code?{" "}
+                Didn&apos;t receive the code?{" "}
                 <button
                   onClick={resendOTP}
                   disabled={resendTimer > 0 || loading}

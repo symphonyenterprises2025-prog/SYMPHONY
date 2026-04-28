@@ -46,6 +46,7 @@ export default function CheckoutPage() {
   // Fetch cart data on mount
   useEffect(() => {
     fetchCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchCart() {
@@ -162,7 +163,7 @@ export default function CheckoutPage() {
                 Order Placed Successfully!
               </h1>
               <p className="mt-4 text-slate-600">
-                Thank you for your order. We've sent a confirmation email to <strong>{formData.email}</strong>.
+                Thank you for your order. We&apos;ve sent a confirmation email to <strong>{formData.email}</strong>.
               </p>
               <div className="mt-6 rounded-xl bg-[#f8f2e5] p-4">
                 <p className="text-sm text-slate-500">Order Number</p>
