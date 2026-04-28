@@ -12,12 +12,14 @@ import {
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
 import { getBlogPosts } from "@/features/catalog/queries";
-import { BlogPost } from "@prisma/client";
+
+// Type inferred from getBlogPosts return type
+type BlogPost = Awaited<ReturnType<typeof getBlogPosts>>[number];
 
 export default async function BlogPage() {
-  const posts: BlogPost[] = await getBlogPosts().catch(() => []);
+  const posts = await getBlogPosts().catch(() => [] as BlogPost[]);
 
-  const blogPosts = posts.map((post: BlogPost) => ({
+  const blogPosts = posts.map((post) => ({
     title: post.title,
     excerpt: post.excerpt || "",
     image: post.coverImage || "/images/fnp/products/gift01.webp",
