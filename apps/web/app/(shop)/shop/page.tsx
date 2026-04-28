@@ -52,7 +52,7 @@ export default async function ShopPage(props: {
 
   const { products, total, totalPages } = paginatedData;
 
-  const productCards = products.map((product: ProductWithRelations, index) => ({
+  const productCards = products.map((product: ProductWithRelations, index: number) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
     image: product.images[0]?.url || "/images/fnp/products/mugs.png",
