@@ -13,6 +13,10 @@ import {
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
 import { getCategories, getCollections, getPaginatedProducts } from "@/features/catalog/queries";
+
+// Types inferred from query returns
+type ProductWithRelations = Awaited<ReturnType<typeof getPaginatedProducts>>['products'][number];
+type Category = Awaited<ReturnType<typeof getCategories>>[number];
 import { SortDropdown } from "@/components/shop/sort-dropdown";
 import { SearchInput } from "@/components/shop/search-input";
 
@@ -48,7 +52,7 @@ export default async function ShopPage(props: {
 
   const { products, total, totalPages } = paginatedData;
 
-  const productCards = products.map((product, index) => ({
+  const productCards = products.map((product: ProductWithRelations, index) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
     image: product.images[0]?.url || "/images/fnp/products/mugs.png",
@@ -56,7 +60,7 @@ export default async function ShopPage(props: {
     label: index === 0 && !categorySlug && !searchQuery && currentPage === 1 ? "Featured" : undefined,
   }));
 
-  const categoryCards = categories.slice(0, 4).map((category) => ({
+  const categoryCards = categories.slice(0, 4).map((category: Category) => ({
     title: category.name,
     description: category.description,
     image: category.image || "/images/fnp/products/mugs.png",

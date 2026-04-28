@@ -19,7 +19,7 @@ type BlogPost = Awaited<ReturnType<typeof getBlogPosts>>[number];
 export default async function BlogPage() {
   const posts = await getBlogPosts().catch(() => [] as BlogPost[]);
 
-  const blogPosts = posts.map((post) => ({
+  const blogPosts = posts.map((post: BlogPost) => ({
     title: post.title,
     excerpt: post.excerpt || "",
     image: post.coverImage || "/images/fnp/products/gift01.webp",
