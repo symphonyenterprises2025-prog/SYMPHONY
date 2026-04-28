@@ -9,7 +9,9 @@ out
 .turbo
 
 # Environment
-
+.env
+.env*.local
+.env.production
 
 # Database
 *.db
