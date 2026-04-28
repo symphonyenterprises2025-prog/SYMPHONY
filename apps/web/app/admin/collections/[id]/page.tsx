@@ -44,11 +44,12 @@ async function deleteCollection(formData: FormData) {
   redirect("/admin/collections");
 }
 
-export default async function EditCollectionPage({ params }: { params: { id: string } }) {
+export default async function EditCollectionPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
 
+  const { id } = await params;
   const collection = await prisma.collection.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!collection) {
