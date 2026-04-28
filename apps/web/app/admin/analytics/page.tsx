@@ -103,7 +103,7 @@ export default async function AdminAnalyticsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentOrders.map((order) => (
+            {recentOrders.map((order: typeof recentOrders[number]) => (
               <div key={order.id} className="flex items-center justify-between border-b pb-4 last:border-0">
                 <div>
                   <p className="font-medium">{order.orderNumber}</p>
