@@ -126,7 +126,7 @@ export default async function AdminAnalyticsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {topProducts.map((item, index) => (
+            {topProducts.map((item: typeof topProducts[number], index: number) => (
               <div key={item.productId} className="flex items-center justify-between border-b pb-4 last:border-0">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center font-semibold text-amber-800">
