@@ -13,7 +13,7 @@ export async function createOrder(data: {
   const userId = session?.user?.id
 
   // Calculate totals
-  const subtotal = data.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const subtotal = data.items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)
   const shippingCost = 99
   const tax = subtotal * 0.18
   const total = subtotal + shippingCost + tax
@@ -35,7 +35,7 @@ export async function createOrder(data: {
       discount: 0,
       total,
       items: {
-        create: data.items.map((item) => ({
+        create: data.items.map((item: any) => ({
           productId: item.productId,
           variantId: item.variantId,
           productName: item.name,

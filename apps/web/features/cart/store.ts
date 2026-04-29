@@ -32,11 +32,11 @@ export const useCart = create<CartStore>()(
       isOpen: false,
 
       addItem: (item) => {
-        const existingItem = get().items.find((i) => i.variantId === item.variantId)
+        const existingItem = get().items.find((i: CartItem) => i.variantId === item.variantId)
         
         if (existingItem) {
           set({
-            items: get().items.map((i) =>
+            items: get().items.map((i: CartItem) =>
               i.variantId === item.variantId
                 ? { ...i, quantity: i.quantity + 1 }
                 : i
@@ -48,7 +48,7 @@ export const useCart = create<CartStore>()(
       },
 
       removeItem: (variantId) => {
-        set({ items: get().items.filter((i) => i.variantId !== variantId) })
+        set({ items: get().items.filter((i: CartItem) => i.variantId !== variantId) })
       },
 
       updateQuantity: (variantId, quantity) => {
@@ -56,7 +56,7 @@ export const useCart = create<CartStore>()(
           get().removeItem(variantId)
         } else {
           set({
-            items: get().items.map((i) =>
+            items: get().items.map((i: CartItem) =>
               i.variantId === variantId ? { ...i, quantity } : i
             ),
           })
@@ -69,11 +69,11 @@ export const useCart = create<CartStore>()(
       closeCart: () => set({ isOpen: false }),
 
       getTotalPrice: () => {
-        return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
+        return get().items.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0)
       },
 
       getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0)
+        return get().items.reduce((total: number, item: CartItem) => total + item.quantity, 0)
       },
     }),
     {
