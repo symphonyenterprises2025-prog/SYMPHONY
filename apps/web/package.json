@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "cd ../../prisma && npx prisma generate && cd ../apps/web && next build",
+    "build": "pnpm --filter prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
     "test:e2e": "playwright test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "postinstall": "cd ../../prisma && npx prisma generate"
+    "postinstall": "pnpm --filter prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
