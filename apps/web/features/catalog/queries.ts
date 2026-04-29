@@ -259,13 +259,13 @@ export async function getPaginatedProducts({
 
       // Apply price-based sorting in JavaScript
       if (sort === 'price-low') {
-        products.sort((a, b) => {
+        products.sort((a: typeof products[number], b: typeof products[number]) => {
           const priceA = a.variants[0]?.price || 0
           const priceB = b.variants[0]?.price || 0
           return Number(priceA) - Number(priceB)
         })
       } else if (sort === 'price-high') {
-        products.sort((a, b) => {
+        products.sort((a: typeof products[number], b: typeof products[number]) => {
           const priceA = a.variants[0]?.price || 0
           const priceB = b.variants[0]?.price || 0
           return Number(priceB) - Number(priceA)
