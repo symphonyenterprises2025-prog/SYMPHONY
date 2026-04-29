@@ -6,6 +6,7 @@
     "prepare": "pnpm db:generate",
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "start": "pnpm --filter web start",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
