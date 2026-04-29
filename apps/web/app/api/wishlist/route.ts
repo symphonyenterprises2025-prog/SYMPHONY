@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Fetch products separately
-    const productIds = wishlistItems.map(item => item.productId)
+    const productIds = wishlistItems.map((item: typeof wishlistItems[number]) => item.productId)
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
       include: {
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    const wishlistWithProducts = wishlistItems.map(item => ({
+    const wishlistWithProducts = wishlistItems.map((item: typeof wishlistItems[number]) => ({
       ...item,
-      product: products.find(p => p.id === item.productId),
+      product: products.find((p: typeof products[number]) => p.id === item.productId),
     }))
 
     return NextResponse.json(wishlistWithProducts)
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Fetch products separately
-    const productIds = wishlistItems.map(item => item.productId)
+    const productIds = wishlistItems.map((item: typeof wishlistItems[number]) => item.productId)
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
       include: {
@@ -84,9 +84,9 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    const wishlistWithProducts = wishlistItems.map(item => ({
+    const wishlistWithProducts = wishlistItems.map((item: typeof wishlistItems[number]) => ({
       ...item,
-      product: products.find(p => p.id === item.productId),
+      product: products.find((p: typeof products[number]) => p.id === item.productId),
     }))
 
     return NextResponse.json(wishlistWithProducts)
@@ -133,7 +133,7 @@ export async function DELETE(request: NextRequest) {
     })
 
     // Fetch products separately
-    const productIds = wishlistItems.map(item => item.productId)
+    const productIds = wishlistItems.map((item: typeof wishlistItems[number]) => item.productId)
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
       include: {
@@ -144,9 +144,9 @@ export async function DELETE(request: NextRequest) {
       },
     })
 
-    const wishlistWithProducts = wishlistItems.map(item => ({
+    const wishlistWithProducts = wishlistItems.map((item: typeof wishlistItems[number]) => ({
       ...item,
-      product: products.find(p => p.id === item.productId),
+      product: products.find((p: typeof products[number]) => p.id === item.productId),
     }))
 
     return NextResponse.json(wishlistWithProducts)
