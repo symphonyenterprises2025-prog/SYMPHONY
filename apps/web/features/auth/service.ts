@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
-import type { UserRole } from '@prisma/client'
+
+type UserRole = 'ADMIN' | 'MANAGER' | 'EDITOR' | 'CUSTOMER'
 
 export class AuthService {
   static async getUserById(id: string) {
