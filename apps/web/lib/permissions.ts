@@ -1,5 +1,6 @@
 import { USER_ROLES } from './constants'
-import type { UserRole } from '@prisma/client'
+
+type UserRole = 'ADMIN' | 'MANAGER' | 'EDITOR' | 'CUSTOMER'
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   ADMIN: 4,
