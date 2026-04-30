@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { updateProduct, deleteProduct, addProductImage, deleteProductImage, updateProductVariant } from '@/features/catalog/actions'
+import { updateProduct, deleteProduct, addProductImage, deleteProductImage, upsertProductVariant } from '@/features/catalog/actions'
 import { useRouter } from 'next/navigation'
 import { useState, useRef } from 'react'
 import { X, Upload, ImageIcon } from 'lucide-react'
@@ -99,7 +99,6 @@ export function EditProductForm({ product, categories }: { product: any & { imag
     const isFeatured = formData.get('isFeatured') === 'on'
 
     // Get variant data
-    const variantId = formData.get('variantId') as string
     const price = parseFloat(formData.get('price') as string) || 0
     const comparePrice = parseFloat(formData.get('comparePrice') as string) || null
     const stock = parseInt(formData.get('stock') as string) || 0
@@ -116,15 +115,13 @@ export function EditProductForm({ product, categories }: { product: any & { imag
         isFeatured,
       })
 
-      // Update variant if exists
-      if (variantId) {
-        await updateProductVariant(variantId, {
-          price,
-          comparePrice,
-          stock,
-          sku,
-        })
-      }
+      // Upsert variant (create if doesn't exist, update if exists)
+      await upsertProductVariant(product.id, {
+        price,
+        comparePrice,
+        stock,
+        sku,
+      })
 
       router.push('/admin/products')
       router.refresh()
@@ -177,9 +174,6 @@ export function EditProductForm({ product, categories }: { product: any & { imag
           ))}
         </select>
       </div>
-
-      {/* Hidden variant ID */}
-      <input type="hidden" name="variantId" value={variants[0]?.id || ''} />
 
       {/* Pricing Section */}
       <div className="grid grid-cols-2 gap-4">

@@ -136,3 +136,49 @@ export async function updateProductVariant(variantId: string, data: {
   revalidateProducts()
   return variant
 }
+
+export async function upsertProductVariant(productId: string, data: {
+  price?: number
+  comparePrice?: number | null
+  stock?: number
+  sku?: string
+}) {
+  // Check if product has any variants
+  const existingVariant = await prisma.productVariant.findFirst({
+    where: { productId },
+  })
+
+  if (existingVariant) {
+    // Update existing variant
+    const variant = await prisma.productVariant.update({
+      where: { id: existingVariant.id },
+      data: {
+        price: data.price,
+        comparePrice: data.comparePrice,
+        stock: data.stock,
+        sku: data.sku || existingVariant.sku,
+      },
+    })
+    revalidateProducts()
+    return variant
+  } else {
+    // Create new default variant
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+    })
+    const variant = await prisma.productVariant.create({
+      data: {
+        productId,
+        name: 'Default',
+        sku: data.sku || `${product?.slug || 'product'}-default`,
+        price: data.price || 0,
+        comparePrice: data.comparePrice || null,
+        stock: data.stock || 0,
+        isActive: true,
+        attributes: {},
+      },
+    })
+    revalidateProducts()
+    return variant
+  }
+}
