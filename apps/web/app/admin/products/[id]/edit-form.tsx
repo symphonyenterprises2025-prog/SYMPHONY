@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { updateProduct, deleteProduct, addProductImage, deleteProductImage } from '@/features/catalog/actions'
+import { updateProduct, deleteProduct, addProductImage, deleteProductImage, updateProductVariant } from '@/features/catalog/actions'
 import { useRouter } from 'next/navigation'
 import { useState, useRef } from 'react'
 import { X, Upload, ImageIcon } from 'lucide-react'
@@ -18,7 +18,16 @@ interface ProductImage {
   sortOrder: number
 }
 
-export function EditProductForm({ product, categories }: { product: any & { images: ProductImage[] }, categories: any[] }) {
+interface ProductVariant {
+  id: string
+  name: string
+  sku: string
+  price: number
+  comparePrice: number | null
+  stock: number
+}
+
+export function EditProductForm({ product, categories }: { product: any & { images: ProductImage[], variants: ProductVariant[] }, categories: any[] }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -26,6 +35,7 @@ export function EditProductForm({ product, categories }: { product: any & { imag
   const [images, setImages] = useState<ProductImage[]>(product.images || [])
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [variants, setVariants] = useState<ProductVariant[]>(product.variants || [])
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -88,6 +98,13 @@ export function EditProductForm({ product, categories }: { product: any & { imag
     const isActive = formData.get('isActive') === 'on'
     const isFeatured = formData.get('isFeatured') === 'on'
 
+    // Get variant data
+    const variantId = formData.get('variantId') as string
+    const price = parseFloat(formData.get('price') as string) || 0
+    const comparePrice = parseFloat(formData.get('comparePrice') as string) || null
+    const stock = parseInt(formData.get('stock') as string) || 0
+    const sku = formData.get('sku') as string
+
     try {
       await updateProduct(product.id, {
         name,
@@ -98,6 +115,17 @@ export function EditProductForm({ product, categories }: { product: any & { imag
         isActive,
         isFeatured,
       })
+
+      // Update variant if exists
+      if (variantId) {
+        await updateProductVariant(variantId, {
+          price,
+          comparePrice,
+          stock,
+          sku,
+        })
+      }
+
       router.push('/admin/products')
       router.refresh()
     } catch (err: any) {
@@ -148,6 +176,60 @@ export function EditProductForm({ product, categories }: { product: any & { imag
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
+      </div>
+
+      {/* Hidden variant ID */}
+      <input type="hidden" name="variantId" value={variants[0]?.id || ''} />
+
+      {/* Pricing Section */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="price">Price (₹) *</Label>
+          <Input 
+            id="price" 
+            name="price" 
+            type="number" 
+            min="0" 
+            step="0.01" 
+            required 
+            defaultValue={variants[0]?.price || 0}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="comparePrice">Compare Price (₹)</Label>
+          <Input 
+            id="comparePrice" 
+            name="comparePrice" 
+            type="number" 
+            min="0" 
+            step="0.01"
+            defaultValue={variants[0]?.comparePrice || ''}
+          />
+        </div>
+      </div>
+
+      {/* Stock & SKU */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="stock">Stock Quantity *</Label>
+          <Input 
+            id="stock" 
+            name="stock" 
+            type="number" 
+            min="0" 
+            required
+            defaultValue={variants[0]?.stock || 0}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="sku">SKU *</Label>
+          <Input 
+            id="sku" 
+            name="sku" 
+            required
+            defaultValue={variants[0]?.sku || ''}
+          />
+        </div>
       </div>
 
       <div className="space-y-2">

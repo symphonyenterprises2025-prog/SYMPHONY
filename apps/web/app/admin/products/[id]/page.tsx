@@ -16,6 +16,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     include: {
       images: {
         orderBy: { sortOrder: 'asc' }
+      },
+      variants: {
+        orderBy: { createdAt: 'asc' }
       }
     }
   })

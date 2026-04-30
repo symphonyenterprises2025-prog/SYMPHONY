@@ -28,12 +28,34 @@ export async function createProduct(data: {
   categoryId: string
   isActive?: boolean
   isFeatured?: boolean
+  price?: number
+  comparePrice?: number
+  stock?: number
+  sku?: string
 }) {
   const product = await prisma.product.create({
     data: {
-      ...data,
+      name: data.name,
+      slug: data.slug,
+      description: data.description,
+      shortDesc: data.shortDesc,
+      categoryId: data.categoryId,
       isActive: data.isActive ?? true,
       isFeatured: data.isFeatured ?? false,
+      variants: {
+        create: {
+          name: 'Default',
+          sku: data.sku || `${data.slug}-default`,
+          price: data.price || 0,
+          comparePrice: data.comparePrice || null,
+          stock: data.stock || 0,
+          isActive: true,
+          attributes: {},
+        },
+      },
+    },
+    include: {
+      variants: true,
     },
   })
 
@@ -93,4 +115,24 @@ export async function updateProductImageOrder(imageId: string, sortOrder: number
   })
 
   revalidateProducts()
+}
+
+export async function updateProductVariant(variantId: string, data: {
+  price?: number
+  comparePrice?: number | null
+  stock?: number
+  sku?: string
+}) {
+  const variant = await prisma.productVariant.update({
+    where: { id: variantId },
+    data: {
+      price: data.price,
+      comparePrice: data.comparePrice,
+      stock: data.stock,
+      sku: data.sku,
+    },
+  })
+
+  revalidateProducts()
+  return variant
 }

@@ -26,6 +26,10 @@ export function NewProductForm({ categories }: { categories: any[] }) {
     const shortDesc = formData.get('shortDesc') as string
     const description = formData.get('description') as string
     const categoryId = formData.get('categoryId') as string
+    const price = parseFloat(formData.get('price') as string) || 0
+    const comparePrice = parseFloat(formData.get('comparePrice') as string) || undefined
+    const stock = parseInt(formData.get('stock') as string) || 0
+    const sku = formData.get('sku') as string
     const isActive = formData.get('isActive') === 'on'
     const isFeatured = formData.get('isFeatured') === 'on'
 
@@ -36,6 +40,10 @@ export function NewProductForm({ categories }: { categories: any[] }) {
         description,
         shortDesc,
         categoryId,
+        price,
+        comparePrice,
+        stock,
+        sku,
         isActive,
         isFeatured,
       })
@@ -76,6 +84,30 @@ export function NewProductForm({ categories }: { categories: any[] }) {
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
+      </div>
+
+      {/* Pricing Section */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="price">Price (₹) *</Label>
+          <Input id="price" name="price" type="number" min="0" step="0.01" required placeholder="0.00" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="comparePrice">Compare Price (₹)</Label>
+          <Input id="comparePrice" name="comparePrice" type="number" min="0" step="0.01" placeholder="0.00" />
+        </div>
+      </div>
+
+      {/* Stock & SKU */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="stock">Stock Quantity *</Label>
+          <Input id="stock" name="stock" type="number" min="0" required placeholder="0" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="sku">SKU *</Label>
+          <Input id="sku" name="sku" required placeholder="PROD-001" />
+        </div>
       </div>
 
       <div className="space-y-2">
