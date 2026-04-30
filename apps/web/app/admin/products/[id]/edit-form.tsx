@@ -9,6 +9,7 @@ import { updateProduct, deleteProduct, addProductImage, deleteProductImage } fro
 import { useRouter } from 'next/navigation'
 import { useState, useRef } from 'react'
 import { X, Upload, ImageIcon } from 'lucide-react'
+import Image from 'next/image'
 
 interface ProductImage {
   id: string
@@ -171,10 +172,11 @@ export function EditProductForm({ product, categories }: { product: any & { imag
           <div className="grid grid-cols-3 gap-4">
             {images.map((image: ProductImage, index: number) => (
               <div key={image.id} className="relative group aspect-square">
-                <img
+                <Image
                   src={image.url}
                   alt={image.alt || `Product image ${index + 1}`}
-                  className="w-full h-full object-cover rounded-lg border"
+                  fill
+                  className="object-cover rounded-lg border"
                 />
                 <button
                   type="button"

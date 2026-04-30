@@ -94,7 +94,7 @@ export function NewProductForm({ categories }: { categories: any[] }) {
         <div>
           <p className="text-sm text-blue-700 font-medium">Product Images</p>
           <p className="text-sm text-blue-600">
-            You can add product images after creating the product. Click "Create Product" to continue.
+            You can add product images after creating the product. Click &quot;Create Product&quot; to continue.
           </p>
         </div>
       </div>
