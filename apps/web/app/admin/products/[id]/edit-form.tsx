@@ -5,15 +5,73 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { updateProduct, deleteProduct } from '@/features/catalog/actions'
+import { updateProduct, deleteProduct, addProductImage, deleteProductImage } from '@/features/catalog/actions'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { X, Upload, ImageIcon } from 'lucide-react'
 
-export function EditProductForm({ product, categories }: { product: any, categories: any[] }) {
+interface ProductImage {
+  id: string
+  url: string
+  alt: string | null
+  sortOrder: number
+}
+
+export function EditProductForm({ product, categories }: { product: any & { images: ProductImage[] }, categories: any[] }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+  const [images, setImages] = useState<ProductImage[]>(product.images || [])
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to upload image')
+      }
+
+      const data = await res.json()
+      
+      // Add image to product
+      const newImage = await addProductImage(product.id, data.url, file.name)
+      setImages([...images, newImage])
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload image')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  async function handleDeleteImage(imageId: string) {
+    if (!confirm('Are you sure you want to delete this image?')) return
+
+    try {
+      await deleteProductImage(imageId)
+      setImages(images.filter((img: ProductImage) => img.id !== imageId))
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete image')
+    }
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -99,6 +157,66 @@ export function EditProductForm({ product, categories }: { product: any, categor
       <div className="space-y-2">
         <Label htmlFor="description">Full Description</Label>
         <Textarea id="description" name="description" defaultValue={product.description} rows={6} required />
+      </div>
+
+      {/* Product Images Section */}
+      <div className="space-y-4 pt-4 border-t">
+        <Label className="text-base font-semibold flex items-center gap-2">
+          <ImageIcon className="w-4 h-4" />
+          Product Images
+        </Label>
+        
+        {/* Image Gallery */}
+        {images.length > 0 && (
+          <div className="grid grid-cols-3 gap-4">
+            {images.map((image: ProductImage, index: number) => (
+              <div key={image.id} className="relative group aspect-square">
+                <img
+                  src={image.url}
+                  alt={image.alt || `Product image ${index + 1}`}
+                  className="w-full h-full object-cover rounded-lg border"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleDeleteImage(image.id)}
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                {index === 0 && (
+                  <span className="absolute bottom-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded">
+                    Primary
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Upload Button */}
+        <div className="flex items-center gap-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={handleImageUpload}
+            className="hidden"
+            id="image-upload"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            {uploading ? 'Uploading...' : 'Upload Image'}
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Max 5MB. JPG, PNG, WebP, GIF
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-col space-y-3 pt-2">

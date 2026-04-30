@@ -58,3 +58,39 @@ export async function deleteProduct(id: string) {
 
   revalidateProducts()
 }
+
+export async function addProductImage(productId: string, url: string, alt?: string) {
+  const maxOrder = await prisma.productImage.findFirst({
+    where: { productId },
+    orderBy: { sortOrder: 'desc' },
+  })
+
+  const image = await prisma.productImage.create({
+    data: {
+      productId,
+      url,
+      alt: alt || '',
+      sortOrder: (maxOrder?.sortOrder ?? -1) + 1,
+    },
+  })
+
+  revalidateProducts()
+  return image
+}
+
+export async function deleteProductImage(imageId: string) {
+  await prisma.productImage.delete({
+    where: { id: imageId },
+  })
+
+  revalidateProducts()
+}
+
+export async function updateProductImageOrder(imageId: string, sortOrder: number) {
+  await prisma.productImage.update({
+    where: { id: imageId },
+    data: { sortOrder },
+  })
+
+  revalidateProducts()
+}

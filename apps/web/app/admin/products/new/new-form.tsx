@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { createProduct } from '@/features/catalog/actions'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { ImageIcon } from 'lucide-react'
 
 export function NewProductForm({ categories }: { categories: any[] }) {
   const router = useRouter()
@@ -29,7 +30,7 @@ export function NewProductForm({ categories }: { categories: any[] }) {
     const isFeatured = formData.get('isFeatured') === 'on'
 
     try {
-      await createProduct({
+      const product = await createProduct({
         name,
         slug,
         description,
@@ -38,7 +39,8 @@ export function NewProductForm({ categories }: { categories: any[] }) {
         isActive,
         isFeatured,
       })
-      router.push('/admin/products')
+      // Navigate to edit page to add images
+      router.push(`/admin/products/${product.id}`)
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'Failed to create product')
@@ -84,6 +86,17 @@ export function NewProductForm({ categories }: { categories: any[] }) {
       <div className="space-y-2">
         <Label htmlFor="description">Full Description</Label>
         <Textarea id="description" name="description" rows={6} required />
+      </div>
+
+      {/* Info about images */}
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+        <ImageIcon className="w-5 h-5 text-blue-500 mt-0.5" />
+        <div>
+          <p className="text-sm text-blue-700 font-medium">Product Images</p>
+          <p className="text-sm text-blue-600">
+            You can add product images after creating the product. Click "Create Product" to continue.
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-col space-y-3 pt-2">
