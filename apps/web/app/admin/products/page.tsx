@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
+import { DeleteProductButton } from "./delete-button";
 
 export const dynamic = "force-dynamic";
 
@@ -63,9 +64,12 @@ export default async function AdminProductsPage() {
                     </td>
                     <td className="px-4 py-4 text-muted-foreground">{product.isFeatured ? "Yes" : "No"}</td>
                     <td className="px-4 py-4 text-right">
-                      <Link href={`/admin/products/${product.id}`} className="font-semibold hover:underline">
-                        Edit
-                      </Link>
+                      <div className="flex items-center justify-end gap-3">
+                        <Link href={`/admin/products/${product.id}`} className="font-semibold hover:underline">
+                          Edit
+                        </Link>
+                        <DeleteProductButton productId={product.id} productName={product.name} />
+                      </div>
                     </td>
                   </tr>
                 ))
