@@ -4,6 +4,14 @@ import { authOptions } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  // Check if Supabase is configured
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return NextResponse.json(
+      { error: 'Storage not configured. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.' },
+      { status: 500 }
+    )
+  }
+
   try {
     const session = await getServerSession(authOptions)
     
