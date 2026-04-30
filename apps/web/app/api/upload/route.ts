@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,24 +42,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
     // Generate unique filename
     const timestamp = Date.now()
     const randomString = Math.random().toString(36).substring(2, 8)
-    const filename = `${timestamp}-${randomString}-${file.name}`
+    const filename = `${timestamp}-${randomString}-${file.name.replace(/\s+/g, '-')}`
     
-    // Ensure upload directory exists
-    const uploadDir = join(process.cwd(), 'public', 'uploads')
-    await mkdir(uploadDir, { recursive: true })
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('product-images')
+      .upload(filename, file, {
+        contentType: file.type,
+        upsert: false,
+      })
 
-    // Write file
-    const filepath = join(uploadDir, filename)
-    await writeFile(filepath, buffer)
+    if (error) {
+      console.error('Supabase upload error:', error)
+      return NextResponse.json(
+        { error: 'Failed to upload to storage' },
+        { status: 500 }
+      )
+    }
 
-    // Return public URL
-    const publicUrl = `/uploads/${filename}`
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(filename)
 
     return NextResponse.json({
       url: publicUrl,
