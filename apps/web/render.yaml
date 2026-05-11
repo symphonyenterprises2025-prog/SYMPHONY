@@ -42,3 +42,12 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+  - type: cron
+    name: symphony-ping
+    runtime: node
+    plan: free
+    schedule: "*/5 * * * *"
+    startCommand: node -e "require('https').get('https://symphony-ecommerce.onrender.com/api/ping', () => {})"
+    envVars:
+      - key: NODE_ENV
+        value: production
