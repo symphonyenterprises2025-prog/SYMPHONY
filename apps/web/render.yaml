@@ -47,7 +47,7 @@ services:
     runtime: node
     plan: free
     schedule: "*/5 * * * *"
-    startCommand: node -e "require('https').get('https://symphony-ecommerce.onrender.com/api/ping', () => {})"
+    startCommand: node ping.js
     envVars:
       - key: NODE_ENV
         value: production
