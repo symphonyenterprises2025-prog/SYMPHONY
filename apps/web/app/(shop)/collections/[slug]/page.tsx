@@ -45,7 +45,7 @@ export default async function CollectionDetailPage({ params }: { params: Promise
           eyebrow="Collection"
           title={collection.name}
           description={collection.description || `Browse our ${collection.name} collection`}
-          image={collection.image || "/images/fnp/banner/b2.jpg"}
+          image={collection.image || "/images/collections/gift-hampers.jpg"}
         />
         <StorefrontContainer>
           <div className="mt-6">

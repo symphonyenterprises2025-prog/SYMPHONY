@@ -45,7 +45,7 @@ export default async function OccasionDetailPage({ params }: { params: Promise<{
           eyebrow="Occasion"
           title={occasion.name}
           description={occasion.description || `Find the perfect gift for ${occasion.name}`}
-          image={occasion.image || "/images/fnp/banner/b2.jpg"}
+          image={occasion.image || "/images/occasions/birthday.jpg"}
         />
         <StorefrontContainer>
           <div className="mt-6">

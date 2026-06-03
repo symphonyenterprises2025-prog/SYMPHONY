@@ -56,7 +56,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   }
 
   const firstVariant = product.variants.find((v: any) => v.id === selectedVariant) || product.variants[0];
-  const mainImage = product.images[0]?.url || "/images/fnp/products/gift01.webp";
+  const mainImage = product.images[0]?.url || "/images/collections/gift-hampers.jpg";
   const gallery =
     product.images.length > 0
       ? product.images

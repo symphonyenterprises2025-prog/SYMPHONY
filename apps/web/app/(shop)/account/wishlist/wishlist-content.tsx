@@ -115,7 +115,7 @@ export function WishlistContent() {
                 <div key={item.id} className="overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
                   <div className="relative aspect-square overflow-hidden bg-[#f7f2e8]">
                     <Image 
-                      src={item.product.images[0]?.url || "/images/fnp/products/gift01.webp"} 
+                      src={item.product.images[0]?.url || "/images/collections/gift-hampers.jpg"} 
                       alt={item.product.name} 
                       fill 
                       className="object-cover transition-transform duration-500 hover:scale-105" 

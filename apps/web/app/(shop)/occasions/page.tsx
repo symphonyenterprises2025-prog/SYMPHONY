@@ -58,8 +58,8 @@ export default async function OccasionsPage() {
               <div className="relative min-h-[380px] sm:min-h-[460px]">
                 <HeroRotator
                   images={[
-                    { url: "/images/fnp/banner/b17.jpg", alt: "Occasions Banner 1" },
-                    { url: "/images/fnp/banner/b18.jpg", alt: "Occasions Banner 2" },
+                    { url: "/images/occasions/birthday.jpg", alt: "Occasions Banner 1" },
+                    { url: "/images/occasions/anniversary.jpg", alt: "Occasions Banner 2" },
                   ]}
                   interval={5000}
                 />

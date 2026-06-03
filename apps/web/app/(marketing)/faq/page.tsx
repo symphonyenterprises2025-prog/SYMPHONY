@@ -85,7 +85,7 @@ export default function FAQPage() {
               eyebrow="Support Center"
               title="Answers to the questions customers ask before they order."
               description="This covers the practical side of gifting with Symphony: timelines, personalization, bulk orders, proofs, and how to contact us when an order needs guidance."
-              image="/images/fnp/banner/b18.jpg"
+              image="/images/home/banner2.jpg"
             />
           </div>
 

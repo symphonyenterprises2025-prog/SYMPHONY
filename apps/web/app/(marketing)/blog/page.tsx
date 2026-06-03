@@ -22,7 +22,7 @@ export default async function BlogPage() {
   const blogPosts = posts.map((post: BlogPost) => ({
     title: post.title,
     excerpt: post.excerpt || "",
-    image: post.coverImage || "/images/fnp/products/gift01.webp",
+    image: post.coverImage || "/images/collections/gift-hampers.jpg",
     date: post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : "",
     author: post.author || "Symphony Editorial",
     category: "Gifting",
@@ -42,7 +42,7 @@ export default async function BlogPage() {
               eyebrow="Symphony Journal"
               title="Notes, guides, and inspiration from a gifting-first brand."
               description="The Journal covers personalization, festive gifting, corporate presentation, awards, and the small decisions that make custom products look more premium."
-              image="/images/fnp/banner/b16.jpg"
+              image="/images/home/banner1.jpg"
             />
           </div>
 

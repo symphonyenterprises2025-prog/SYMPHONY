@@ -25,7 +25,7 @@ export default async function CustomizedTShirtsPage() {
   const productCards = products.map((product: ProductWithRelations) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
-    image: product.images[0]?.url || "/images/fnp/products/gift01.webp",
+    image: product.images[0]?.url || "/images/tshirts/custom-tshirt.jpg",
     href: `/shop/${product.slug}`,
   }));
 

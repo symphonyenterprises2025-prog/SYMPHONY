@@ -61,10 +61,21 @@ export default async function ShopPage(props: {
     label: index === 0 && !categorySlug && !searchQuery && currentPage === 1 ? "Featured" : undefined,
   }));
 
+  const getCategoryImage = (slug: string): string => {
+    const imageMap: Record<string, string> = {
+      'festive-hampers': '/images/categories/festive-hampers.jpg',
+      'gift-hampers': '/images/categories/gift-hampers.jpg',
+      'corporate-gifts': '/images/categories/corporate-gifts.jpg',
+      'onboarding-welcome-kits': '/images/categories/onboarding-kits.jpg',
+      'corporate-gifting': '/images/categories/corporate-gifts.jpg',
+    };
+    return imageMap[slug] || '/images/collections/gift-hampers.jpg';
+  };
+
   const categoryCards = categories.slice(0, 4).map((category: Category) => ({
     title: category.name,
     description: category.description,
-    image: category.image || "/images/collections/gift-hampers.jpg",
+    image: category.image || getCategoryImage(category.slug),
     href: `/shop?category=${category.slug}`,
   }));
 

@@ -46,7 +46,7 @@ export default function CartPage() {
             name: item.product?.name || item.productName,
             price: Number(item.variant?.price || item.price || 0),
             quantity: item.quantity,
-            image: item.product?.images?.[0]?.url || item.image || "/images/fnp/products/gift01.webp",
+            image: item.product?.images?.[0]?.url || item.image || "/images/collections/gift-hampers.jpg",
             variant: item.variant?.name || item.variantName || "Standard",
           })));
         }

@@ -51,8 +51,8 @@ export default async function CollectionsPage() {
               <div className="relative min-h-[380px] sm:min-h-[460px]">
                 <HeroRotator
                   images={[
-                    { url: "/images/fnp/banner/b20.jpg", alt: "Collections Banner 1" },
-                    { url: "/images/fnp/banner/b16.jpg", alt: "Collections Banner 2" },
+                    { url: "/images/home/banner2.jpg", alt: "Collections Banner 1" },
+                    { url: "/images/home/banner3.jpg", alt: "Collections Banner 2" },
                   ]}
                   interval={5000}
                 />

@@ -87,7 +87,7 @@ export default function TrackOrderPage() {
               eyebrow="Delivery Updates"
               title="Track the latest movement on your Symphony order."
               description="Enter the order number and the email or phone used at checkout."
-              image="/images/fnp/banner/b2.jpg"
+              image="/images/home/banner1.jpg"
               overlayClassName="absolute inset-0 bg-gradient-to-r from-[#0f2230]/76 via-[#173a53]/35 to-transparent"
             />
           </div>
