@@ -9,6 +9,9 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { StorefrontCanvas, StorefrontContainer } from "@/components/storefront/brand-system";
 import { getBlogPostBySlug } from "@/features/content/queries";
 
+// Make this page dynamic to avoid build-time database access
+export const dynamic = 'force-dynamic'
+
 export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);

@@ -13,6 +13,9 @@ import {
 } from "@/components/storefront/brand-system";
 import { getBlogPosts } from "@/features/content/queries";
 
+// Make this page dynamic to avoid build-time database access
+export const dynamic = 'force-dynamic'
+
 // Type inferred from getBlogPosts return type
 type BlogPost = Awaited<ReturnType<typeof getBlogPosts>>[number];
 

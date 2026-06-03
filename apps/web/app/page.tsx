@@ -13,6 +13,9 @@ import {
 import { HeroRotator } from "@/components/storefront/hero-rotator";
 import { getProducts, getShopByCategories } from "@/features/catalog/queries";
 
+// Make this page dynamic to avoid build-time database access
+export const dynamic = 'force-dynamic'
+
 type ProductWithRelations = Awaited<ReturnType<typeof getProducts>>[number];
 type ShopByCategory = Awaited<ReturnType<typeof getShopByCategories>>[number];
 

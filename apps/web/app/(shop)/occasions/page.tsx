@@ -12,6 +12,9 @@ import {
 import { HeroRotator } from "@/components/storefront/hero-rotator";
 import { getOccasions } from "@/features/catalog/queries";
 
+// Make this page dynamic to avoid build-time database access
+export const dynamic = 'force-dynamic'
+
 // Type inferred from query return
 type Occasion = Awaited<ReturnType<typeof getOccasions>>[number];
 
