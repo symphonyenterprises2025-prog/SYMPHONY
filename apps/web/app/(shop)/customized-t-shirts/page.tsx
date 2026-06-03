@@ -12,6 +12,9 @@ import {
 } from "@/components/storefront/brand-system";
 import { getPaginatedProducts } from "@/features/catalog/queries";
 
+// Make this page dynamic to avoid build-time database access
+export const dynamic = 'force-dynamic'
+
 type ProductWithRelations = Awaited<ReturnType<typeof getPaginatedProducts>>['products'][number];
 
 export default async function CustomizedTShirtsPage() {
