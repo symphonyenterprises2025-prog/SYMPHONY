@@ -4,12 +4,12 @@ services:
     runtime: node
     plan: free
     buildCommand: pnpm install --no-frozen-lockfile && pnpm run build
-    startCommand: node .next/standalone/server.js
+    startCommand: pnpm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: NODE_OPTIONS
-        value: --max-old-space-size=384
+        value: --max-old-space-size=256
       - key: DATABASE_URL
         sync: false
       - key: NEXTAUTH_SECRET

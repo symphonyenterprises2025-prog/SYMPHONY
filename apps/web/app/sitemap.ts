@@ -64,69 +64,59 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Dynamic pages from database
-  let productPages: MetadataRoute.Sitemap = []
-  let blogPages: MetadataRoute.Sitemap = []
-  let collectionPages: MetadataRoute.Sitemap = []
-  let occasionPages: MetadataRoute.Sitemap = []
+  // Dynamic pages from database - limit queries for memory optimization
+  let dynamicPages: MetadataRoute.Sitemap = []
 
   try {
-    // Products
+    // Use a single query with take limit to reduce memory
     const products = await prisma.product.findMany({
       where: { isActive: true },
       select: { slug: true, updatedAt: true },
+      take: 50, // Limit to 50 products for memory optimization
+      orderBy: { updatedAt: 'desc' },
     })
 
-    productPages = products.map((product: typeof products[number]) => ({
+    dynamicPages = products.map((product: typeof products[number]) => ({
       url: `${baseUrl}/shop/${product.slug}`,
       lastModified: product.updatedAt,
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     }))
 
-    // Blog posts
-    const blogPosts = await prisma.blogPost.findMany({
-      where: { isPublished: true },
-      select: { slug: true, updatedAt: true },
-    })
-
-    blogPages = blogPosts.map((post: typeof blogPosts[number]) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: post.updatedAt,
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    }))
-
-    // Collections
+    // Add limited collections
     const collections = await prisma.collection.findMany({
       where: { isActive: true },
       select: { slug: true, updatedAt: true },
+      take: 20,
+      orderBy: { updatedAt: 'desc' },
     })
 
-    collectionPages = collections.map((collection: typeof collections[number]) => ({
+    dynamicPages.push(...collections.map((collection: typeof collections[number]) => ({
       url: `${baseUrl}/collections/${collection.slug}`,
       lastModified: collection.updatedAt,
       changeFrequency: 'weekly' as const,
       priority: 0.7,
-    }))
+    })))
 
-    // Occasions
+    // Add limited occasions
     const occasions = await prisma.occasion.findMany({
       where: { isActive: true },
       select: { slug: true, updatedAt: true },
+      take: 20,
+      orderBy: { updatedAt: 'desc' },
     })
 
-    occasionPages = occasions.map((occasion: typeof occasions[number]) => ({
+    dynamicPages.push(...occasions.map((occasion: typeof occasions[number]) => ({
       url: `${baseUrl}/occasions/${occasion.slug}`,
       lastModified: occasion.updatedAt,
       changeFrequency: 'weekly' as const,
       priority: 0.7,
-    }))
+    })))
   } catch (error) {
     console.error('Error generating sitemap:', error)
     // Return static pages only if DB connection fails
     return staticPages
   }
 
-  return [...staticPages, ...productPages, ...blogPages, ...collectionPages, ...occasionPages]
+  return [...staticPages, ...dynamicPages]
 }
