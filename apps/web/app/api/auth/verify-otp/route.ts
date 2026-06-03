@@ -1,21 +1,43 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { verifyOTP, deleteOTPs } from "@/lib/otp";
 import { sendTransactionalEmail } from "@/lib/email/brevo";
 import { getWelcomeEmailTemplate } from "@/lib/email/templates";
+import { rateLimit } from "@/lib/rate-limit";
+
+const verifySchema = z.object({
+  email: z.string().email(),
+  otp: z.string().length(6),
+  name: z.string().min(2, "Name is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  phone: z.string().optional(),
+  whatsapp: z.string().optional(),
+});
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, otp, name, password, phone, whatsapp } = body;
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    const rl = rateLimit(`verify-otp:${ip}`, 5, 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
 
-    if (!email || !otp) {
+    const body = await request.json();
+    const result = verifySchema.safeParse(body);
+
+    if (!result.success) {
       return NextResponse.json(
         { error: "Email and OTP are required" },
         { status: 400 }
       );
     }
+
+    const { email, otp, name, password, phone, whatsapp } = result.data;
 
     // Verify OTP
     const isValid = await verifyOTP(email, otp);

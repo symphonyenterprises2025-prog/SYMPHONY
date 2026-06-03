@@ -1,20 +1,38 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { generateOTP, storeOTP } from "@/lib/otp";
 import { sendTransactionalEmail } from "@/lib/email/brevo";
 import { getOTPEmailTemplate } from "@/lib/email/templates";
+import { rateLimit } from "@/lib/rate-limit";
+
+const resendSchema = z.object({
+  email: z.string().email(),
+  name: z.string().optional(),
+});
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, name } = body;
-
-    if (!email) {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    const rl = rateLimit(`resend-otp:${ip}`, 3, 60 * 1000);
+    if (!rl.allowed) {
       return NextResponse.json(
-        { error: "Email is required" },
+        { error: "Too many attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    const body = await request.json();
+    const result = resendSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Valid email is required" },
         { status: 400 }
       );
     }
+
+    const { email, name } = result.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({

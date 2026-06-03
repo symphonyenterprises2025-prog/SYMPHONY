@@ -1,52 +1,57 @@
 import { prisma } from './db'
+import bcrypt from 'bcryptjs'
 
 // Generate a 6-digit OTP
 export function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
-// Store OTP in database
+// Store OTP in database (hashed)
 export async function storeOTP(email: string, otp: string, expiresInMinutes: number = 10): Promise<void> {
   const expires = new Date(Date.now() + expiresInMinutes * 60 * 1000)
-  
+  const hashedCode = await bcrypt.hash(otp, 10)
+
   // Delete any existing OTP for this email
   await prisma.otpCode.deleteMany({
     where: { email }
   })
-  
-  // Create new OTP record
+
+  // Create new OTP record with hashed code
   await prisma.otpCode.create({
     data: {
       email,
-      code: otp,
+      code: hashedCode,
       expires,
       verified: false,
     }
   })
 }
 
-// Verify OTP
+// Verify OTP against hashed code
 export async function verifyOTP(email: string, otp: string): Promise<boolean> {
-  const record = await prisma.otpCode.findUnique({
+  // Find all unexpired, unverified OTP records for this email
+  const records = await prisma.otpCode.findMany({
     where: {
-      email_code: {
-        email,
-        code: otp,
-      }
+      email,
+      expires: { gt: new Date() },
+      verified: false,
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  for (const record of records) {
+    const isValid = await bcrypt.compare(otp, record.code)
+    if (isValid) {
+      // Mark OTP as verified
+      await prisma.otpCode.update({
+        where: { id: record.id },
+        data: { verified: true },
+      })
+      return true
     }
-  })
-  
-  if (!record || record.expires < new Date() || record.verified) {
-    return false
   }
-  
-  // Mark OTP as verified
-  await prisma.otpCode.update({
-    where: { id: record.id },
-    data: { verified: true }
-  })
-  
-  return true
+
+  return false
 }
 
 // Check if OTP exists and is valid
@@ -60,7 +65,7 @@ export async function hasValidOTP(email: string): Promise<boolean> {
       verified: false,
     }
   })
-  
+
   return count > 0
 }
 
@@ -76,7 +81,7 @@ export async function getOTPExpiryTime(email: string): Promise<Date | null> {
     },
     select: { expires: true }
   })
-  
+
   return record?.expires || null
 }
 

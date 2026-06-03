@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { z } from 'zod'
+
+const addToCartSchema = z.object({
+  productId: z.string().min(1, "Product ID is required"),
+  variantId: z.string().min(1, "Variant ID is required"),
+  quantity: z.number().int().min(1).default(1),
+})
 
 export async function GET(request: NextRequest) {
   try {
@@ -56,7 +63,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { productId, variantId, quantity = 1 } = body
+    const result = addToCartSchema.safeParse(body)
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.errors[0].message },
+        { status: 400 }
+      )
+    }
+
+    const { productId, variantId, quantity } = result.data
 
     // Get or create cart
     let cart = await prisma.cart.findUnique({

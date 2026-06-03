@@ -8,105 +8,81 @@ import {
   StorefrontCanvas,
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
+import { prisma } from "@/lib/db";
+import { notFound } from "next/navigation";
 
-const occasion = {
-  name: "Birthday",
-  description:
-    "A birthday-focused mix of personalized keepsakes, custom drinkware, framed memories, and celebration-ready gift sets.",
-  image: "/images/fnp/products/gift09.webp",
-};
+export const dynamic = 'force-dynamic';
 
-const products = [
-  {
-    name: "Personalized Birthday Cushion",
-    price: 1499,
-    image: "/images/fnp/products/gift01.webp",
-    href: "/shop",
-    label: "Bestseller",
-  },
-  {
-    name: "Birthday Photo Frame",
-    price: 999,
-    image: "/images/fnp/products/gift03.webp",
-    href: "/shop",
-  },
-  {
-    name: "Custom Birthday Mug",
-    price: 499,
-    image: "/images/fnp/products/gift15.webp",
-    href: "/shop",
-    label: "Popular",
-  },
-  {
-    name: "Birthday Gift Hamper",
-    price: 2499,
-    image: "/images/fnp/products/gift06.webp",
-    href: "/shop",
-    label: "New",
-  },
-  {
-    name: "Engraved Birthday Pen",
-    price: 699,
-    image: "/images/fnp/products/gift02.webp",
-    href: "/shop",
-  },
-  {
-    name: "Birthday Crystal Trophy",
-    price: 1299,
-    image: "/images/fnp/products/gift22.webp",
-    href: "/shop",
-    label: "Premium",
-  },
-  {
-    name: "Personalized Calendar",
-    price: 549,
-    image: "/images/fnp/products/gift08.webp",
-    href: "/shop",
-  },
-  {
-    name: "Birthday LED Sign",
-    price: 1499,
-    image: "/images/fnp/products/gift12.webp",
-    href: "/shop",
-  },
-];
+export default async function OccasionDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-export default function OccasionDetailPage() {
+  const [occasion, products] = await Promise.all([
+    prisma.occasion.findUnique({
+      where: { slug, isActive: true },
+    }),
+    prisma.product.findMany({
+      where: {
+        occasions: { some: { slug } },
+        isActive: true,
+      },
+      include: {
+        images: { orderBy: { sortOrder: 'asc' }, take: 1 },
+        variants: { where: { isActive: true }, select: { price: true, comparePrice: true } },
+      },
+      take: 20,
+    }),
+  ]);
+
+  if (!occasion) {
+    notFound();
+  }
+
   return (
     <StorefrontCanvas>
       <SiteHeader />
-
-      <main className="pb-16 pt-8">
+      <main className="pb-16">
+        <BrandedHero
+          eyebrow="Occasion"
+          title={occasion.name}
+          description={occasion.description || `Find the perfect gift for ${occasion.name}`}
+          image={occasion.image || "/images/fnp/banner/b2.jpg"}
+        />
         <StorefrontContainer>
-          <Breadcrumbs
-            items={[{ label: "Occasions", href: "/occasions" }, { label: occasion.name }]}
-          />
-
           <div className="mt-6">
-            <BrandedHero
-              eyebrow="Occasion Detail"
-              title={`${occasion.name} Gifts`}
-              description={occasion.description}
-              image={occasion.image}
-              overlayClassName="absolute inset-0 bg-gradient-to-r from-[#231330]/72 via-[#4b2a66]/35 to-transparent"
+            <Breadcrumbs
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Occasions", href: "/occasions" },
+                { label: occasion.name },
+              ]}
             />
           </div>
-
-          <section className="mt-10">
-            <SectionHeading
-              eyebrow="Selected for the Occasion"
-              title="Products that fit the moment without feeling generic."
-              description="The selection balances quick personal gifts with higher-impact presentation pieces for milestone birthdays."
-            />
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {products.map((product: typeof products[number]) => (
-                <BrandProductCard key={product.name} {...product} />
-              ))}
+          <SectionHeading
+            eyebrow={`${products.length} products`}
+            title={occasion.name}
+            className="mt-8"
+          />
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product) => {
+              const firstVariant = product.variants[0];
+              return (
+                <BrandProductCard
+                  key={product.id}
+                  name={product.name}
+                  price={firstVariant ? Number(firstVariant.price) : 0}
+                  image={product.images[0]?.url || "/images/fnp/products/gift01.webp"}
+                  href={`/shop/${product.slug}`}
+                />
+              );
+            })}
+          </div>
+          {products.length === 0 && (
+            <div className="mt-10 rounded-[2rem] border border-[#eadfca] bg-white p-10 text-center">
+              <p className="text-slate-500">No products found for this occasion.</p>
             </div>
-          </section>
+          )}
         </StorefrontContainer>
       </main>
-
       <SiteFooter />
     </StorefrontCanvas>
   );

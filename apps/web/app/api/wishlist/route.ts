@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { z } from 'zod'
+
+const wishlistItemSchema = z.object({
+  productId: z.string().min(1, "Product ID is required"),
+})
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,7 +63,33 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { productId } = body
+    const result = wishlistItemSchema.safeParse(body)
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.errors[0].message },
+        { status: 400 }
+      )
+    }
+
+    const { productId } = result.data
+
+    // Check for duplicate
+    const existing = await prisma.wishlistItem.findUnique({
+      where: {
+        userId_productId: {
+          userId: session.user?.id,
+          productId,
+        },
+      },
+    })
+
+    if (existing) {
+      return NextResponse.json(
+        { error: 'Item already in wishlist' },
+        { status: 409 }
+      )
+    }
 
     await prisma.wishlistItem.create({
       data: {

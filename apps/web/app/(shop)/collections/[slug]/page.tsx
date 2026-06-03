@@ -8,106 +8,81 @@ import {
   StorefrontCanvas,
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
+import { prisma } from "@/lib/db";
+import { notFound } from "next/navigation";
 
-const collection = {
-  name: "Gift Hampers",
-  description:
-    "A presentation-led selection of festive boxes, celebration hampers, and premium bundles that work for both personal and corporate gifting.",
-  image: "/images/fnp/products/gift23.webp",
-};
+export const dynamic = 'force-dynamic';
 
-const products = [
-  {
-    name: "Premium Birthday Hamper",
-    price: 2499,
-    image: "/images/fnp/products/gift06.webp",
-    href: "/shop",
-    label: "Bestseller",
-  },
-  {
-    name: "Anniversary Special Hamper",
-    price: 3499,
-    image: "/images/fnp/products/gift12.webp",
-    href: "/shop",
-    label: "New",
-  },
-  {
-    name: "Diwali Gift Hamper",
-    price: 4999,
-    image: "/images/fnp/products/gift16.webp",
-    href: "/shop",
-  },
-  {
-    name: "Corporate Gift Box",
-    price: 5999,
-    image: "/images/fnp/products/gift11.webp",
-    href: "/shop",
-    label: "Corporate",
-  },
-  {
-    name: "Chocolate Delight Hamper",
-    price: 1999,
-    image: "/images/fnp/products/gift20.webp",
-    href: "/shop",
-  },
-  {
-    name: "Personalized Gift Set",
-    price: 2999,
-    image: "/images/fnp/products/gift22.webp",
-    href: "/shop",
-    label: "Popular",
-  },
-  {
-    name: "Flower and Cake Combo",
-    price: 1799,
-    image: "/images/fnp/products/gift18.webp",
-    href: "/shop",
-  },
-  {
-    name: "Spa and Wellness Hamper",
-    price: 3999,
-    image: "/images/fnp/products/gift24.webp",
-    href: "/shop",
-    label: "Premium",
-  },
-];
+export default async function CollectionDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-export default function CollectionDetailPage() {
+  const [collection, products] = await Promise.all([
+    prisma.collection.findUnique({
+      where: { slug, isActive: true },
+    }),
+    prisma.product.findMany({
+      where: {
+        collections: { some: { slug } },
+        isActive: true,
+      },
+      include: {
+        images: { orderBy: { sortOrder: 'asc' }, take: 1 },
+        variants: { where: { isActive: true }, select: { price: true, comparePrice: true } },
+      },
+      take: 20,
+    }),
+  ]);
+
+  if (!collection) {
+    notFound();
+  }
+
   return (
     <StorefrontCanvas>
       <SiteHeader />
-
-      <main className="pb-16 pt-8">
+      <main className="pb-16">
+        <BrandedHero
+          eyebrow="Collection"
+          title={collection.name}
+          description={collection.description || `Browse our ${collection.name} collection`}
+          image={collection.image || "/images/fnp/banner/b2.jpg"}
+        />
         <StorefrontContainer>
-          <Breadcrumbs
-            items={[{ label: "Collections", href: "/collections" }, { label: collection.name }]}
-          />
-
           <div className="mt-6">
-            <BrandedHero
-              eyebrow="Collection Detail"
-              title={collection.name}
-              description={collection.description}
-              image={collection.image}
-              overlayClassName="absolute inset-0 bg-gradient-to-r from-[#2a1207]/72 via-[#4e2410]/40 to-transparent"
+            <Breadcrumbs
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Collections", href: "/collections" },
+                { label: collection.name },
+              ]}
             />
           </div>
-
-          <section className="mt-10">
-            <SectionHeading
-              eyebrow="Inside This Collection"
-              title="Products curated for presentation-led gifting."
-              description="This mix is built for celebrations and polished gifting moments where the box, the reveal, and the overall composition matter."
-            />
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {products.map((product: typeof products[number]) => (
-                <BrandProductCard key={product.name} {...product} />
-              ))}
+          <SectionHeading
+            eyebrow={`${products.length} products`}
+            title={collection.name}
+            className="mt-8"
+          />
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product) => {
+              const firstVariant = product.variants[0];
+              return (
+                <BrandProductCard
+                  key={product.id}
+                  name={product.name}
+                  price={firstVariant ? Number(firstVariant.price) : 0}
+                  image={product.images[0]?.url || "/images/fnp/products/gift01.webp"}
+                  href={`/shop/${product.slug}`}
+                />
+              );
+            })}
+          </div>
+          {products.length === 0 && (
+            <div className="mt-10 rounded-[2rem] border border-[#eadfca] bg-white p-10 text-center">
+              <p className="text-slate-500">No products found in this collection.</p>
             </div>
-          </section>
+          )}
         </StorefrontContainer>
       </main>
-
       <SiteFooter />
     </StorefrontCanvas>
   );
