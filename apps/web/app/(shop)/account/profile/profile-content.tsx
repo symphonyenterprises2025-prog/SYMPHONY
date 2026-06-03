@@ -17,6 +17,9 @@ export function ProfileContent() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   if (status === "unauthenticated") {
     router.push("/login");
@@ -48,6 +51,52 @@ export function ProfileContent() {
       console.error("Failed to update profile", err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handlePasswordChange(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setPasswordLoading(true);
+    setPasswordError("");
+    setPasswordSuccess(false);
+
+    const formData = new FormData(e.currentTarget);
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match");
+      setPasswordLoading(false);
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters");
+      setPasswordLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setPasswordSuccess(true);
+        e.currentTarget.reset();
+        setTimeout(() => setPasswordSuccess(false), 3000);
+      } else {
+        setPasswordError(data.error || "Failed to update password");
+      }
+    } catch (err) {
+      setPasswordError("An error occurred. Please try again.");
+    } finally {
+      setPasswordLoading(false);
     }
   }
 
@@ -97,11 +146,23 @@ export function ProfileContent() {
             </div>
             <div className="mt-8 rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_24px_60px_rgba(45,36,20,0.1)] sm:p-8">
               <h3 className="font-sans text-[1.7rem] font-semibold text-slate-950">Change Password</h3>
-              <form className="mt-6 space-y-5">
-                <div className="space-y-2"><Label htmlFor="currentPassword">Current Password</Label><Input id="currentPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" /></div>
-                <div className="space-y-2"><Label htmlFor="newPassword">New Password</Label><Input id="newPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" /></div>
-                <div className="space-y-2"><Label htmlFor="confirmPassword">Confirm New Password</Label><Input id="confirmPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" /></div>
-                <Button type="submit" variant="outline" className="h-12 rounded-full border-[#d0b57a] bg-white px-8 text-sm font-semibold uppercase tracking-wide text-slate-900 hover:bg-[#f8f2e5]">Update Password</Button>
+              {passwordSuccess && (
+                <div className="mb-6 rounded-2xl border border-[#c5e8c7] bg-[#eaf7f1] px-4 py-3 text-center text-sm font-semibold text-[#1f7a57]">
+                  Password updated successfully!
+                </div>
+              )}
+              {passwordError && (
+                <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600">
+                  {passwordError}
+                </div>
+              )}
+              <form onSubmit={handlePasswordChange} className="mt-6 space-y-5">
+                <div className="space-y-2"><Label htmlFor="currentPassword">Current Password</Label><Input id="currentPassword" name="currentPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" required /></div>
+                <div className="space-y-2"><Label htmlFor="newPassword">New Password</Label><Input id="newPassword" name="newPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" required /></div>
+                <div className="space-y-2"><Label htmlFor="confirmPassword">Confirm New Password</Label><Input id="confirmPassword" name="confirmPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" required /></div>
+                <Button type="submit" variant="outline" className="h-12 rounded-full border-[#d0b57a] bg-white px-8 text-sm font-semibold uppercase tracking-wide text-slate-900 hover:bg-[#f8f2e5]" disabled={passwordLoading}>
+                  {passwordLoading ? "Updating..." : "Update Password"}
+                </Button>
               </form>
             </div>
           </div>

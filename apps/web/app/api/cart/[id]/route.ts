@@ -3,6 +3,15 @@ import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
+async function verifyCartItemOwnership(itemId: string, userId: string | undefined): Promise<boolean> {
+  if (!userId) return false
+  const item = await prisma.cartItem.findUnique({
+    where: { id: itemId },
+    include: { cart: { select: { userId: true } } },
+  })
+  return item?.cart.userId === userId
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -15,6 +24,13 @@ export async function PUT(
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    if (!(await verifyCartItemOwnership(id, session.user?.id))) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
       )
     }
 
@@ -70,6 +86,13 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    if (!(await verifyCartItemOwnership(id, session.user?.id))) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
       )
     }
 

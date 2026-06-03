@@ -23,19 +23,6 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Check for hardcoded admin credentials (fallback)
-        if (
-          credentials.email === 'admin@symphonyenterprise.co.in' &&
-          credentials.password === 'Prakash@2026'
-        ) {
-          return {
-            id: 'admin-1',
-            email: 'admin@symphonyenterprise.co.in',
-            name: 'Admin',
-            role: 'ADMIN',
-          }
-        }
-
         // Check database for user authentication
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },

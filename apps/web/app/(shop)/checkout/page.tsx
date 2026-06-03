@@ -7,9 +7,9 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { StorefrontCanvas, StorefrontContainer } from "@/components/storefront/brand-system";
 
 interface CartItem {
@@ -37,7 +37,8 @@ export default function CheckoutPage() {
     state: "",
     pincode: "",
     saveAddress: false,
-    paymentMethod: "UPI",
+    paymentMethod: "COD",
+    giftWrapping: false,
   });
   const [error, setError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -68,8 +69,8 @@ export default function CheckoutPage() {
 
   const subtotal = cartItems.reduce((acc: number, item: CartItem) => acc + item.price * item.quantity, 0);
   const shipping = subtotal > 999 ? 0 : 99;
-  const giftWrapping = 99;
-  const tax = Math.round(subtotal * 0.09); // 9% tax
+  const giftWrapping = formData.giftWrapping ? 99 : 0;
+  const tax = Math.round(subtotal * 0.09);
   const total = subtotal + shipping + giftWrapping + tax;
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -104,9 +105,6 @@ export default function CheckoutPage() {
         variantId: item.variantId,
         productName: item.name,
         variantName: item.variant,
-        price: item.price,
-        quantity: item.quantity,
-        total: item.price * item.quantity,
       })),
       shippingAddress: {
         firstName: formData.firstName,
@@ -117,11 +115,7 @@ export default function CheckoutPage() {
         postalCode: formData.pincode,
         country: "India",
       },
-      subtotal,
-      shippingCost: shipping,
-      tax,
-      discount: 0,
-      total,
+      isGiftWrapped: formData.giftWrapping,
       paymentMethod: formData.paymentMethod,
     };
 
@@ -367,26 +361,39 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {[
-                    { label: "UPI", detail: "Google Pay, PhonePe, Paytm", active: true },
-                    { label: "Credit or Debit Card", detail: "Visa, Mastercard, RuPay" },
-                    { label: "Cash on Delivery", detail: "For eligible orders and locations" },
-                  ].map((method: { label: string; detail: string; active?: boolean }) => (
-                    <div
-                      key={method.label}
-                      className={`rounded-[1.4rem] border p-4 ${method.active ? "border-[#c59a46] bg-[#f8f2e5]" : "border-[#eadfca] bg-white"}`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <Checkbox id={method.label} checked={method.active} />
-                          <Label htmlFor={method.label} className="font-semibold text-slate-950">
-                            {method.label}
-                          </Label>
-                        </div>
-                        <span className="text-sm text-slate-500">{method.detail}</span>
+                    {[
+                      { label: "Cash on Delivery", detail: "Pay when you receive your order" },
+                    ].map((method) => (
+                      <div
+                        key={method.label}
+                        className={`rounded-[1.4rem] border p-4 ${formData.paymentMethod === method.label ? "border-[#c59a46] bg-[#f8f2e5]" : "border-[#eadfca] bg-white"}`}
+                      >
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value={method.label}
+                            checked={formData.paymentMethod === method.label}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, paymentMethod: e.target.value }))}
+                            className="h-4 w-4 text-[#1f3763] focus:ring-[#1f3763]"
+                          />
+                          <span className="font-semibold text-slate-950">{method.label}</span>
+                          <span className="text-sm text-slate-500 ml-auto">{method.detail}</span>
+                        </label>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                </div>
+                <div className="mt-6 flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="giftWrapping"
+                    checked={formData.giftWrapping}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, giftWrapping: e.target.checked }))}
+                    className="h-4 w-4 rounded border-[#e6dbc4] text-[#1f3763] focus:ring-[#1f3763]"
+                  />
+                  <Label htmlFor="giftWrapping" className="text-sm text-slate-600 cursor-pointer">
+                    Add gift wrapping (+₹99)
+                  </Label>
                 </div>
               </div>
             </div>
@@ -413,10 +420,12 @@ export default function CheckoutPage() {
                       {shipping === 0 ? "Free" : `₹${shipping}`}
                     </span>
                   </div>
+                  {formData.giftWrapping && (
                   <div className="flex items-center justify-between">
                     <span>Gift Wrapping</span>
                     <span className="font-semibold text-slate-950">₹{giftWrapping}</span>
                   </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <span>Tax (9%)</span>
                     <span className="font-semibold text-slate-950">₹{tax}</span>

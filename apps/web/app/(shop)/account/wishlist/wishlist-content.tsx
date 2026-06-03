@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Heart, ShoppingBag, Trash2 } from "lucide-react";
+import { Heart, ShoppingBag, Trash2, Loader2 } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -27,6 +27,7 @@ export function WishlistContent() {
   const router = useRouter();
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -50,6 +51,45 @@ export function WishlistContent() {
       console.error("Error fetching wishlist:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const addToCart = async (item: WishlistItem) => {
+    setActionLoading(item.id);
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: item.product.id,
+          variantId: item.product.id,
+          quantity: 1,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to add to cart");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const removeFromWishlist = async (item: WishlistItem) => {
+    setActionLoading(item.id);
+    try {
+      const res = await fetch(`/api/wishlist?productId=${item.product.id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setWishlistItems((prev) => prev.filter((i) => i.id !== item.id));
+      }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -80,7 +120,11 @@ export function WishlistContent() {
                       fill 
                       className="object-cover transition-transform duration-500 hover:scale-105" 
                     />
-                    <button className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white/90 text-red-500 shadow-sm backdrop-blur transition-colors hover:bg-red-50">
+                    <button
+                      onClick={() => removeFromWishlist(item)}
+                      disabled={actionLoading === item.id}
+                      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white/90 text-red-500 shadow-sm backdrop-blur transition-colors hover:bg-red-50"
+                    >
                       <Heart className="h-5 w-5 fill-current" />
                     </button>
                   </div>
@@ -88,10 +132,26 @@ export function WishlistContent() {
                     <h3 className="line-clamp-2 font-sans text-base font-semibold text-slate-950">{item.product.name}</h3>
                     <p className="mt-2 font-sans text-lg font-bold text-slate-950">₹{item.product.price}</p>
                     <div className="mt-4 flex gap-2">
-                      <Button size="sm" className="h-9 flex-1 rounded-full bg-[#1f3763] text-xs font-semibold uppercase tracking-wide text-white hover:bg-[#172c53]">
-                        <ShoppingBag className="mr-2 h-3.5 w-3.5" />Add to Cart
+                      <Button
+                        size="sm"
+                        onClick={() => addToCart(item)}
+                        disabled={actionLoading === item.id}
+                        className="h-9 flex-1 rounded-full bg-[#1f3763] text-xs font-semibold uppercase tracking-wide text-white hover:bg-[#172c53] disabled:opacity-50"
+                      >
+                        {actionLoading === item.id ? (
+                          <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <ShoppingBag className="mr-2 h-3.5 w-3.5" />
+                        )}
+                        Add to Cart
                       </Button>
-                      <Button size="sm" variant="outline" className="h-9 rounded-full border-[#d0b57a] bg-white text-xs font-semibold uppercase tracking-wide text-slate-900 hover:bg-[#f8f2e5]">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeFromWishlist(item)}
+                        disabled={actionLoading === item.id}
+                        className="h-9 rounded-full border-[#d0b57a] bg-white text-xs font-semibold uppercase tracking-wide text-slate-900 hover:bg-[#f8f2e5]"
+                      >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>

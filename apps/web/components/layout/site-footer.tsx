@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { Instagram, Mail, MapPin, MessageCircle, Phone, Send, Facebook, Twitter } from "lucide-react";
+import { useState } from "react";
+import { Instagram, Mail, MapPin, MessageCircle, Phone, Send, Facebook, Twitter, Loader2, CheckCircle } from "lucide-react";
 import { BrandWordmark, StorefrontContainer } from "@/components/storefront/brand-system";
 
 const quickLinks = [
@@ -21,6 +24,40 @@ const supportLinks = [
 const paymentMethods = ["AMEX", "VISA", "Mastercard", "PayPal", "Discover", "UPI"];
 
 export function SiteFooter() {
+  const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscribeError, setSubscribeError] = useState("");
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) return;
+
+    setSubscribing(true);
+    setSubscribeError("");
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setSubscribed(true);
+        setEmail("");
+        setTimeout(() => setSubscribed(false), 5000);
+      } else {
+        const data = await res.json();
+        setSubscribeError(data.error || "Failed to subscribe");
+      }
+    } catch {
+      setSubscribeError("Something went wrong. Please try again.");
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   return (
     <footer className="bg-slate-900 border-t border-slate-800">
       <StorefrontContainer className="py-16">
@@ -54,7 +91,7 @@ export function SiteFooter() {
                 <span className="text-sm">Instagram</span>
               </Link>
               <Link
-                href="#"
+                href="https://www.facebook.com/symphonyenterprises"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-2 text-slate-400 transition-all duration-300 hover:text-[#1877F2]"
@@ -63,7 +100,7 @@ export function SiteFooter() {
                 <span className="text-sm">Facebook</span>
               </Link>
               <Link
-                href="#"
+                href="https://twitter.com/symphonyent"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-2 text-slate-400 transition-all duration-300 hover:text-[#1DA1F2]"
@@ -129,16 +166,33 @@ export function SiteFooter() {
             {/* Newsletter */}
             <div className="space-y-3 pt-2">
               <p className="font-sans text-[0.9rem] font-medium text-slate-300">Subscribe to our newsletter</p>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 font-sans text-[0.9rem] text-white placeholder:text-slate-500 focus:border-[#be9548] focus:outline-none focus:ring-2 focus:ring-[#be9548]/20 transition-all"
-                />
-                <button className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#be9548] text-white transition-all duration-300 hover:bg-[#a67d3c]">
-                  <Send className="h-4 w-4" />
-                </button>
-              </div>
+              {subscribed ? (
+                <div className="flex items-center gap-2 rounded-lg border border-green-700 bg-green-900/30 px-4 py-2.5 text-sm text-green-400">
+                  <CheckCircle className="h-4 w-4" />
+                  Subscribed successfully!
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex gap-2">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 font-sans text-[0.9rem] text-white placeholder:text-slate-500 focus:border-[#be9548] focus:outline-none focus:ring-2 focus:ring-[#be9548]/20 transition-all"
+                  />
+                  <button
+                    type="submit"
+                    disabled={subscribing}
+                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#be9548] text-white transition-all duration-300 hover:bg-[#a67d3c] disabled:opacity-50"
+                  >
+                    {subscribing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  </button>
+                </form>
+              )}
+              {subscribeError && (
+                <p className="text-xs text-red-400">{subscribeError}</p>
+              )}
             </div>
           </div>
         </div>

@@ -1,14 +1,12 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Package, User, MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { ArrowLeft, Package, User, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin-auth'
+import { OrderActions } from './order-actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -140,43 +138,12 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
         {/* Order Actions */}
         <div className="space-y-6">
-          {/* Update Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Update Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Order Status</Label>
-                <Select defaultValue={order.status}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PENDING">Pending</SelectItem>
-                    <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                    <SelectItem value="PROCESSING">Processing</SelectItem>
-                    <SelectItem value="SHIPPED">Shipped</SelectItem>
-                    <SelectItem value="DELIVERED">Delivered</SelectItem>
-                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                    <SelectItem value="REFUNDED">Refunded</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="tracking">Tracking Number</Label>
-                <Input id="tracking" placeholder="Enter tracking number" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="notes">Order Notes</Label>
-                <Textarea id="notes" placeholder="Add internal notes..." rows={3} />
-              </div>
-              <Button className="w-full">Update Order</Button>
-            </CardContent>
-          </Card>
+          <OrderActions
+            orderId={order.id}
+            currentStatus={order.status}
+            orderEmail={order.customerEmail}
+            orderName={order.customerName || 'Customer'}
+          />
 
           {/* Order Summary */}
           <Card>
@@ -200,26 +167,6 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                 <span>Total</span>
                 <span>₹{order.total?.toFixed(2) || '0.00'}</span>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                <Mail className="h-4 w-4 mr-2" />
-                Send Email to Customer
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Phone className="h-4 w-4 mr-2" />
-                Call Customer
-              </Button>
-              <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700">
-                Cancel Order
-              </Button>
             </CardContent>
           </Card>
         </div>
