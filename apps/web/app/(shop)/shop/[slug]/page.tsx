@@ -6,6 +6,7 @@ import { Minus, Plus, RefreshCw, Shield, Star, Truck, Heart } from "lucide-react
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { ProductReviews } from "@/components/storefront/product-reviews";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
@@ -298,8 +299,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </TabsContent>
               <TabsContent value="reviews" className="mt-6">
                 <Card className="border-[#eadfca] shadow-none">
-                  <CardContent className="p-6 font-sans text-[1rem] text-slate-600">
-                    Reviews will appear here as customer feedback is collected.
+                  <CardContent className="p-6">
+                    <ProductReviews productId={product.id} />
                   </CardContent>
                 </Card>
               </TabsContent>

@@ -68,3 +68,40 @@ export async function deleteBanner(id: string) {
 
   revalidateContent()
 }
+
+export async function createContentPage(data: {
+  title: string
+  slug: string
+  content: string
+  metaTitle?: string
+  metaDesc?: string
+  isPublished?: boolean
+}) {
+  const page = await prisma.contentPage.create({
+    data: {
+      ...data,
+      publishedAt: data.isPublished ? new Date() : null,
+    },
+  })
+
+  revalidateContent()
+  return page
+}
+
+export async function updateContentPage(id: string, data: any) {
+  const page = await prisma.contentPage.update({
+    where: { id },
+    data,
+  })
+
+  revalidateContent()
+  return page
+}
+
+export async function deleteContentPage(id: string) {
+  await prisma.contentPage.delete({
+    where: { id },
+  })
+
+  revalidateContent()
+}

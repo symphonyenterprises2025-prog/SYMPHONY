@@ -72,6 +72,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </Link>
               </li>
               <li>
+                <Link href="/admin/pages" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
+                  Pages
+                </Link>
+              </li>
+              <li>
                 <Link href="/admin/coupons" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
                   Coupons
                 </Link>

@@ -31,6 +31,7 @@ model User {
   cart          Cart?
   wishlistItems WishlistItem[]
   auditLogs     AuditLog[]
+  reviews       ProductReview[]
 
   @@map("users")
 }
@@ -123,9 +124,10 @@ model Category {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children    Category[] @relation("CategoryHierarchy")
+  parent      Category?       @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[]     @relation("CategoryHierarchy")
   products    Product[]
+  shopByCategories ShopByCategory[]
 
   @@map("categories")
 }
@@ -142,6 +144,7 @@ model Collection {
   updatedAt   DateTime  @updatedAt
 
   products    Product[] @relation("ProductCollections")
+  shopByCategories ShopByCategory[]
 
   @@map("collections")
 }
@@ -158,8 +161,31 @@ model Occasion {
   updatedAt   DateTime  @updatedAt
 
   products    Product[] @relation("ProductOccasions")
+  shopByCategories ShopByCategory[]
 
   @@map("occasions")
+}
+
+model ShopByCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  type        String    // 'festival', 'occasion', 'offer', 'best-selling', etc.
+  description String?   @db.Text
+  image       String?
+  categoryId  String?   // Link to a category if applicable
+  collectionId String?  // Link to a collection if applicable
+  occasionId  String?   // Link to an occasion if applicable
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  collection  Collection? @relation(fields: [collectionId], references: [id])
+  occasion    Occasion?   @relation(fields: [occasionId], references: [id])
+
+  @@map("shop_by_categories")
 }
 
 model Product {
@@ -183,6 +209,7 @@ model Product {
   cartItems   CartItem[]
   orderItems  OrderItem[]
   mediaAssets MediaAsset[]
+  reviews     ProductReview[]
 
   @@map("products")
 }
@@ -557,4 +584,29 @@ enum ShipmentStatus {
 enum DiscountType {
   PERCENTAGE
   FIXED_AMOUNT
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ProductReview {
+  id        String       @id @default(cuid())
+  productId String
+  userId    String?
+  name      String
+  email     String?
+  rating    Int
+  title     String?      @db.Text
+  content   String       @db.Text
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("product_reviews")
 }
