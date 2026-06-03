@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Package } from "lucide-react";
+import { ExternalLink, Package, XCircle } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -29,6 +29,7 @@ export function OrdersContent() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -55,19 +56,44 @@ export function OrdersContent() {
     }
   };
 
+  async function cancelOrder(orderId: string) {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+    setCancellingId(orderId);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/cancel`, { method: "POST" });
+      if (res.ok) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, status: "CANCELLED" } : o))
+        );
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to cancel order");
+      }
+    } catch {
+      alert("Failed to cancel order");
+    } finally {
+      setCancellingId(null);
+    }
+  }
+
   if (status === "unauthenticated" || loading) {
     return null;
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Delivered": return "bg-[#eaf7f1] text-[#1f7a57]";
-      case "In Transit": return "bg-[#eef3fb] text-[#1f3763]";
-      case "Processing": return "bg-[#fffaf1] text-[#c59a46]";
-      case "Cancelled": return "bg-[#fff0f0] text-red-600";
+      case "DELIVERED": return "bg-[#eaf7f1] text-[#1f7a57]";
+      case "SHIPPED":
+      case "IN_TRANSIT": return "bg-[#eef3fb] text-[#1f3763]";
+      case "PROCESSING":
+      case "CONFIRMED":
+      case "PENDING": return "bg-[#fffaf1] text-[#c59a46]";
+      case "CANCELLED": return "bg-[#fff0f0] text-red-600";
       default: return "bg-[#f8f8f8] text-slate-600";
     }
   };
+
+  const cancellableStatuses = ["PENDING", "CONFIRMED"];
 
   return (
     <StorefrontCanvas>
@@ -101,6 +127,18 @@ export function OrdersContent() {
                       <Button variant="outline" size="sm" className="h-11 rounded-full border-[#d0b57a] bg-white px-5 text-xs font-semibold uppercase tracking-wide text-slate-900 hover:bg-[#f8f2e5]">
                         <ExternalLink className="mr-2 h-3.5 w-3.5" />Track Order
                       </Button>
+                      {cancellableStatuses.includes(order.status) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={cancellingId === order.id}
+                          onClick={() => cancelOrder(order.id)}
+                          className="h-11 rounded-full border-red-300 bg-white px-5 text-xs font-semibold uppercase tracking-wide text-red-600 hover:bg-red-50"
+                        >
+                          <XCircle className="mr-2 h-3.5 w-3.5" />
+                          {cancellingId === order.id ? "Cancelling..." : "Cancel"}
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <div className="mt-4 border-t border-[#efe4d1] pt-4">

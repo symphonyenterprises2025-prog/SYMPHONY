@@ -47,6 +47,16 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </Link>
               </li>
               <li>
+                <Link href="/admin/occasions" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
+                  Occasions
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/shop-by-categories" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
+                  Shop By Categories
+                </Link>
+              </li>
+              <li>
                 <Link href="/admin/orders" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
                   Orders
                 </Link>
@@ -59,6 +69,21 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <li>
                 <Link href="/admin/blogs" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
                   Blogs
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/coupons" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
+                  Coupons
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/newsletter" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
+                  Newsletter
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/inquiries" className="block px-3 py-2 rounded-md hover:bg-slate-100 transition-colors">
+                  Inquiries
                 </Link>
               </li>
               <li>

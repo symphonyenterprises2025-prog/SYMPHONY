@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
       notes,
       giftMessage,
       isGiftWrapped,
+      couponCode,
     } = body
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -148,8 +149,32 @@ export async function POST(request: NextRequest) {
     const shippingCost = subtotal > 999 ? 0 : 99
     const giftWrappingCost = isGiftWrapped ? 99 : 0
     const tax = Math.round(subtotal * 0.09)
-    const discount = 0
-    const total = subtotal + shippingCost + giftWrappingCost + tax
+    let discount = 0
+    let couponId: string | undefined
+
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } })
+      if (
+        coupon &&
+        coupon.isActive &&
+        coupon.validFrom <= new Date() &&
+        (!coupon.validUntil || coupon.validUntil >= new Date()) &&
+        (!coupon.usageLimit || coupon.usageCount < coupon.usageLimit) &&
+        (!coupon.minOrderValue || subtotal >= Number(coupon.minOrderValue))
+      ) {
+        if (coupon.discountType === 'PERCENTAGE') {
+          discount = Math.round(subtotal * Number(coupon.discountValue) / 100)
+          if (coupon.maxDiscount && discount > Number(coupon.maxDiscount)) {
+            discount = Number(coupon.maxDiscount)
+          }
+        } else {
+          discount = Number(coupon.discountValue)
+        }
+        couponId = coupon.id
+      }
+    }
+
+    const total = subtotal + shippingCost + giftWrappingCost + tax - discount
     const orderNumber = `SYM-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`
 
     const order = await prisma.$transaction(async (tx) => {
@@ -168,6 +193,7 @@ export async function POST(request: NextRequest) {
           giftMessage,
           isGiftWrapped,
           status: 'PENDING',
+          ...(couponId ? { coupon: { connect: { id: couponId } } } : {}),
           items: { create: orderItemsData },
           address: shippingAddress ? {
             create: {
@@ -195,6 +221,13 @@ export async function POST(request: NextRequest) {
 
       return newOrder
     })
+
+    if (couponId) {
+      await prisma.coupon.update({
+        where: { id: couponId },
+        data: { usageCount: { increment: 1 } },
+      })
+    }
 
     const orderWithItems = order as any
 

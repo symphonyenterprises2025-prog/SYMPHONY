@@ -95,13 +95,22 @@ export default function CartPage() {
     }
   }
 
-  function applyDiscount() {
-    if (discountCode.toLowerCase() === "symphony10") {
-      const discount = Math.round(subtotal * 0.1);
-      setDiscountAmount(discount);
-      setDiscountApplied(true);
-    } else {
-      alert("Invalid discount code");
+  async function applyDiscount() {
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: discountCode, subtotal }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setDiscountAmount(data.coupon.discountAmount);
+        setDiscountApplied(true);
+      } else {
+        alert(data.error || "Invalid discount code");
+      }
+    } catch {
+      alert("Failed to validate coupon. Please try again.");
     }
   }
 

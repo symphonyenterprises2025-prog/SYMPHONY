@@ -43,6 +43,10 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   // Fetch cart data on mount
   useEffect(() => {
@@ -71,7 +75,7 @@ export default function CheckoutPage() {
   const shipping = subtotal > 999 ? 0 : 99;
   const giftWrapping = formData.giftWrapping ? 99 : 0;
   const tax = Math.round(subtotal * 0.09);
-  const total = subtotal + shipping + giftWrapping + tax;
+  const total = subtotal + shipping + giftWrapping + tax - couponDiscount;
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -117,6 +121,7 @@ export default function CheckoutPage() {
       },
       isGiftWrapped: formData.giftWrapping,
       paymentMethod: formData.paymentMethod,
+      couponCode: couponApplied ? couponCode : undefined,
     };
 
     try {
@@ -430,6 +435,12 @@ export default function CheckoutPage() {
                     <span>Tax (9%)</span>
                     <span className="font-semibold text-slate-950">₹{tax}</span>
                   </div>
+                  {couponDiscount > 0 && (
+                    <div className="flex items-center justify-between text-green-600">
+                      <span>Discount</span>
+                      <span className="font-semibold">-₹{couponDiscount}</span>
+                    </div>
+                  )}
                   <div className="border-t border-[#efe4d1] pt-3 text-lg">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-slate-950">Total</span>
@@ -438,7 +449,43 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 rounded-[1.4rem] border border-[#eadfca] bg-[#fbf8f1] p-4 text-sm text-slate-600">
+                <div className="mt-4 flex gap-2">
+                  <Input
+                    placeholder="Coupon code"
+                    value={couponCode}
+                    onChange={(e) => { setCouponCode(e.target.value); setCouponApplied(false); setCouponDiscount(0); }}
+                    className="h-11 rounded-xl border-[#e6dbc4]"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={async () => {
+                      setCouponError("");
+                      try {
+                        const res = await fetch("/api/coupons/validate", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ code: couponCode, subtotal }),
+                        });
+                        const data = await res.json();
+                        if (data.valid) {
+                          setCouponDiscount(data.coupon.discountAmount);
+                          setCouponApplied(true);
+                        } else {
+                          setCouponError(data.error || "Invalid coupon");
+                        }
+                      } catch {
+                        setCouponError("Failed to validate coupon");
+                      }
+                    }}
+                    disabled={!couponCode || couponApplied}
+                    className="h-11 rounded-full border-[#d0b57a] bg-white px-5 text-sm font-semibold uppercase tracking-wide disabled:opacity-50"
+                  >
+                    {couponApplied ? "Applied" : "Apply"}
+                  </Button>
+                </div>
+                {couponError && <p className="mt-1 text-xs text-red-500">{couponError}</p>}
+                <div className="mt-4 rounded-[1.4rem] border border-[#eadfca] bg-[#fbf8f1] p-4 text-sm text-slate-600">
                   Add a note, wrapping option, or personalization request after shipping details are
                   confirmed.
                 </div>
