@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { requireAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -14,24 +15,29 @@ export default async function NewOccasionPage() {
 
   async function createOccasion(formData: FormData) {
     "use server";
+    await requireAdmin();
     
-    const name = formData.get("name") as string;
-    const slug = formData.get("slug") as string;
+    const name = (formData.get("name") as string)?.trim();
+    const slug = (formData.get("slug") as string)?.trim().toLowerCase().replace(/\s+/g, '-');
     const description = formData.get("description") as string;
     const image = formData.get("image") as string;
     const isActive = formData.get("isActive") === "on";
     const sortOrder = parseInt(formData.get("sortOrder") as string) || 0;
 
-    await prisma.occasion.create({
-      data: {
-        name,
-        slug,
-        description,
-        image,
-        isActive,
-        sortOrder,
-      },
-    });
+    if (!name || !slug) {
+      throw new Error("Name and slug are required");
+    }
+
+    try {
+      await prisma.occasion.create({
+        data: { name, slug, description: description || null, image: image || null, isActive, sortOrder },
+      });
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'P2002') {
+        throw new Error("A occasion with this slug already exists");
+      }
+      throw error;
+    }
 
     redirect("/admin/occasions");
   }
@@ -79,9 +85,9 @@ export default async function NewOccasionPage() {
 
           <div className="flex gap-4 pt-4">
             <Button type="submit">Create Occasion</Button>
-            <Button type="button" variant="outline" onClick={() => window.history.back()}>
-              Cancel
-            </Button>
+            <Link href="/admin/occasions">
+              <Button type="button" variant="outline">Cancel</Button>
+            </Link>
           </div>
         </form>
       </div>

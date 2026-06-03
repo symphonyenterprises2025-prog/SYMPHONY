@@ -7,6 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { requireAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+
+const VALID_TYPES = ['festival', 'occasion', 'offer', 'best-selling', 'featured', 'new-arrival'] as const;
 
 export const dynamic = "force-dynamic";
 
@@ -27,15 +30,18 @@ export default async function EditShopByCategoryPage({ params }: { params: Promi
     notFound();
   }
 
-  const categories = await prisma.category.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
-  const collections = await prisma.collection.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
-  const occasions = await prisma.occasion.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
+  const [categories, collections, occasions] = await Promise.all([
+    prisma.category.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+    prisma.collection.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+    prisma.occasion.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+  ]);
 
   async function updateShopByCategory(formData: FormData) {
     "use server";
+    await requireAdmin();
     
-    const name = formData.get("name") as string;
-    const slug = formData.get("slug") as string;
+    const name = (formData.get("name") as string)?.trim();
+    const slug = (formData.get("slug") as string)?.trim().toLowerCase().replace(/\s+/g, '-');
     const type = formData.get("type") as string;
     const description = formData.get("description") as string;
     const image = formData.get("image") as string;
@@ -45,30 +51,39 @@ export default async function EditShopByCategoryPage({ params }: { params: Promi
     const isActive = formData.get("isActive") === "on";
     const sortOrder = parseInt(formData.get("sortOrder") as string) || 0;
 
-    await prisma.shopByCategory.update({
-      where: { id },
-      data: {
-        name,
-        slug,
-        type,
-        description,
-        image,
-        categoryId: categoryId || null,
-        collectionId: collectionId || null,
-        occasionId: occasionId || null,
-        isActive,
-        sortOrder,
-      },
-    });
+    if (!name || !slug || !type) {
+      throw new Error("Name, slug, and type are required");
+    }
+    if (!VALID_TYPES.includes(type as typeof VALID_TYPES[number])) {
+      throw new Error("Invalid type selected");
+    }
+    if ((categoryId ? 1 : 0) + (collectionId ? 1 : 0) + (occasionId ? 1 : 0) > 1) {
+      throw new Error("Only one link (category, collection, or occasion) can be set at a time");
+    }
+
+    try {
+      await prisma.shopByCategory.update({
+        where: { id },
+        data: { name, slug, type, description: description || null, image: image || null, categoryId, collectionId, occasionId, isActive, sortOrder },
+      });
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'P2002') {
+        throw new Error("A shop-by-category with this slug already exists");
+      }
+      throw error;
+    }
 
     redirect("/admin/shop-by-categories");
   }
 
-  async function deleteShopByCategory() {
+  async function deleteShopByCategory(formData: FormData) {
     "use server";
-    await prisma.shopByCategory.delete({
-      where: { id },
-    });
+    await requireAdmin();
+    try {
+      await prisma.shopByCategory.delete({ where: { id } });
+    } catch {
+      throw new Error("Failed to delete. It may be linked to other records.");
+    }
     redirect("/admin/shop-by-categories");
   }
 
@@ -81,8 +96,8 @@ export default async function EditShopByCategoryPage({ params }: { params: Promi
         </p>
       </div>
 
-      <div className="border rounded-lg bg-white p-6">
-        <form action={updateShopByCategory} className="space-y-4 max-w-2xl">
+      <form action={updateShopByCategory} className="space-y-4 max-w-2xl">
+        <div className="border rounded-lg bg-white p-6 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
             <Input id="name" name="name" required defaultValue={shopByCategory.name} />
@@ -179,15 +194,18 @@ export default async function EditShopByCategoryPage({ params }: { params: Promi
 
           <div className="flex gap-4 pt-4">
             <Button type="submit">Update Shop By Category</Button>
-            <Button type="button" variant="outline" onClick={() => window.history.back()}>
-              Cancel
-            </Button>
-            <form action={deleteShopByCategory}>
-              <Button type="submit" variant="destructive">
-                Delete
-              </Button>
-            </form>
+            <Link href="/admin/shop-by-categories">
+              <Button type="button" variant="outline">Cancel</Button>
+            </Link>
           </div>
+        </div>
+      </form>
+
+      <div className="border rounded-lg bg-white p-6">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Danger Zone</h3>
+        <p className="text-sm text-muted-foreground mb-4">Deleting this section cannot be undone.</p>
+        <form action={deleteShopByCategory} onSubmit={(e) => { if (!confirm('Are you sure you want to delete this shop-by-category section?')) e.preventDefault(); }}>
+          <Button type="submit" variant="destructive">Delete Shop By Category</Button>
         </form>
       </div>
     </div>

@@ -181,9 +181,9 @@ model ShopByCategory {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  category    Category?   @relation(fields: [categoryId], references: [id])
-  collection  Collection? @relation(fields: [collectionId], references: [id])
-  occasion    Occasion?   @relation(fields: [occasionId], references: [id])
+  category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  collection  Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  occasion    Occasion?   @relation(fields: [occasionId], references: [id], onDelete: SetNull)
 
   @@map("shop_by_categories")
 }

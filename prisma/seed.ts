@@ -1,13 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'postgresql://postgres:dwnCfCfb%23CT4gJ%26@db.ozuoxykvcfeeylszacoj.supabase.co:5432/postgres'
-    }
-  }
-})
+const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Starting seed...')
@@ -759,6 +753,78 @@ async function main() {
       data: {
         products: {
           connect: [{ id: products[0].id }, { id: products[8].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[4].id },
+      data: {
+        products: {
+          connect: [{ id: products[5].id }, { id: products[8].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[5].id },
+      data: {
+        products: {
+          connect: [{ id: products[4].id }, { id: products[9].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[6].id },
+      data: {
+        products: {
+          connect: [{ id: products[4].id }, { id: products[6].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[7].id },
+      data: {
+        products: {
+          connect: [{ id: products[1].id }, { id: products[3].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[8].id },
+      data: {
+        products: {
+          connect: [{ id: products[0].id }, { id: products[9].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[9].id },
+      data: {
+        products: {
+          connect: [{ id: products[4].id }, { id: products[7].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[10].id },
+      data: {
+        products: {
+          connect: [{ id: products[8].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[11].id },
+      data: {
+        products: {
+          connect: [{ id: products[7].id }],
+        },
+      },
+    }),
+    prisma.occasion.update({
+      where: { id: occasions[12].id },
+      data: {
+        products: {
+          connect: [{ id: products[1].id }, { id: products[5].id }],
         },
       },
     }),

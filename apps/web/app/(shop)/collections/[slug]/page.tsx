@@ -26,7 +26,7 @@ export default async function CollectionDetailPage({ params }: { params: Promise
         isActive: true,
       },
       include: {
-        images: { orderBy: { sortOrder: 'asc' }, take: 1 },
+        images: { orderBy: { sortOrder: 'asc' } },
         variants: { where: { isActive: true }, select: { price: true, comparePrice: true } },
       },
       take: 20,
@@ -70,7 +70,7 @@ export default async function CollectionDetailPage({ params }: { params: Promise
                   key={product.id}
                   name={product.name}
                   price={firstVariant ? Number(firstVariant.price) : 0}
-                  image={product.images[0]?.url || "/images/fnp/products/gift01.webp"}
+                  images={product.images.map(img => img.url)}
                   href={`/shop/${product.slug}`}
                 />
               );

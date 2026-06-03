@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react'
 import { MessageCircle, X, Send } from 'lucide-react'
 
-const WHATSAPP_NUMBER = '917978974823'
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '917978974823'
 
 const QUICK_ACTIONS = [
   { label: '📦 Track My Order', message: 'Hi! I want to track my order.' },

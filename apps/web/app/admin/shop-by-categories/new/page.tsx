@@ -6,21 +6,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { requireAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+
+const VALID_TYPES = ['festival', 'occasion', 'offer', 'best-selling', 'featured', 'new-arrival'] as const;
 
 export const dynamic = "force-dynamic";
 
 export default async function NewShopByCategoryPage() {
   await requireAdmin();
 
-  const categories = await prisma.category.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
-  const collections = await prisma.collection.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
-  const occasions = await prisma.occasion.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
+  const [categories, collections, occasions] = await Promise.all([
+    prisma.category.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+    prisma.collection.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+    prisma.occasion.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+  ]);
 
   async function createShopByCategory(formData: FormData) {
     "use server";
+    await requireAdmin();
     
-    const name = formData.get("name") as string;
-    const slug = formData.get("slug") as string;
+    const name = (formData.get("name") as string)?.trim();
+    const slug = (formData.get("slug") as string)?.trim().toLowerCase().replace(/\s+/g, '-');
     const type = formData.get("type") as string;
     const description = formData.get("description") as string;
     const image = formData.get("image") as string;
@@ -30,20 +36,26 @@ export default async function NewShopByCategoryPage() {
     const isActive = formData.get("isActive") === "on";
     const sortOrder = parseInt(formData.get("sortOrder") as string) || 0;
 
-    await prisma.shopByCategory.create({
-      data: {
-        name,
-        slug,
-        type,
-        description,
-        image,
-        categoryId,
-        collectionId,
-        occasionId,
-        isActive,
-        sortOrder,
-      },
-    });
+    if (!name || !slug || !type) {
+      throw new Error("Name, slug, and type are required");
+    }
+    if (!VALID_TYPES.includes(type as typeof VALID_TYPES[number])) {
+      throw new Error("Invalid type selected");
+    }
+    if ((categoryId ? 1 : 0) + (collectionId ? 1 : 0) + (occasionId ? 1 : 0) > 1) {
+      throw new Error("Only one link (category, collection, or occasion) can be set at a time");
+    }
+
+    try {
+      await prisma.shopByCategory.create({
+        data: { name, slug, type, description: description || null, image: image || null, categoryId, collectionId, occasionId, isActive, sortOrder },
+      });
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'P2002') {
+        throw new Error("A shop-by-category with this slug already exists");
+      }
+      throw error;
+    }
 
     redirect("/admin/shop-by-categories");
   }
@@ -151,9 +163,9 @@ export default async function NewShopByCategoryPage() {
 
           <div className="flex gap-4 pt-4">
             <Button type="submit">Create Shop By Category</Button>
-            <Button type="button" variant="outline" onClick={() => window.history.back()}>
-              Cancel
-            </Button>
+            <Link href="/admin/shop-by-categories">
+              <Button type="button" variant="outline">Cancel</Button>
+            </Link>
           </div>
         </form>
       </div>

@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { requireAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -24,34 +25,42 @@ export default async function EditOccasionPage({ params }: { params: Promise<{ i
 
   async function updateOccasion(formData: FormData) {
     "use server";
+    await requireAdmin();
     
-    const name = formData.get("name") as string;
-    const slug = formData.get("slug") as string;
+    const name = (formData.get("name") as string)?.trim();
+    const slug = (formData.get("slug") as string)?.trim().toLowerCase().replace(/\s+/g, '-');
     const description = formData.get("description") as string;
     const image = formData.get("image") as string;
     const isActive = formData.get("isActive") === "on";
     const sortOrder = parseInt(formData.get("sortOrder") as string) || 0;
 
-    await prisma.occasion.update({
-      where: { id },
-      data: {
-        name,
-        slug,
-        description,
-        image,
-        isActive,
-        sortOrder,
-      },
-    });
+    if (!name || !slug) {
+      throw new Error("Name and slug are required");
+    }
+
+    try {
+      await prisma.occasion.update({
+        where: { id },
+        data: { name, slug, description: description || null, image: image || null, isActive, sortOrder },
+      });
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'P2002') {
+        throw new Error("A occasion with this slug already exists");
+      }
+      throw error;
+    }
 
     redirect("/admin/occasions");
   }
 
-  async function deleteOccasion() {
+  async function deleteOccasion(formData: FormData) {
     "use server";
-    await prisma.occasion.delete({
-      where: { id },
-    });
+    await requireAdmin();
+    try {
+      await prisma.occasion.delete({ where: { id } });
+    } catch {
+      throw new Error("Failed to delete occasion. It may be linked to existing products.");
+    }
     redirect("/admin/occasions");
   }
 
@@ -64,8 +73,8 @@ export default async function EditOccasionPage({ params }: { params: Promise<{ i
         </p>
       </div>
 
-      <div className="border rounded-lg bg-white p-6">
-        <form action={updateOccasion} className="space-y-4 max-w-2xl">
+      <form action={updateOccasion} className="space-y-4 max-w-2xl">
+        <div className="border rounded-lg bg-white p-6 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
             <Input id="name" name="name" required defaultValue={occasion.name} />
@@ -98,15 +107,18 @@ export default async function EditOccasionPage({ params }: { params: Promise<{ i
 
           <div className="flex gap-4 pt-4">
             <Button type="submit">Update Occasion</Button>
-            <Button type="button" variant="outline" onClick={() => window.history.back()}>
-              Cancel
-            </Button>
-            <form action={deleteOccasion}>
-              <Button type="submit" variant="destructive">
-                Delete
-              </Button>
-            </form>
+            <Link href="/admin/occasions">
+              <Button type="button" variant="outline">Cancel</Button>
+            </Link>
           </div>
+        </div>
+      </form>
+
+      <div className="border rounded-lg bg-white p-6">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Danger Zone</h3>
+        <p className="text-sm text-muted-foreground mb-4">Deleting this occasion cannot be undone.</p>
+        <form action={deleteOccasion} onSubmit={(e) => { if (!confirm('Are you sure you want to delete this occasion?')) e.preventDefault(); }}>
+          <Button type="submit" variant="destructive">Delete Occasion</Button>
         </form>
       </div>
     </div>

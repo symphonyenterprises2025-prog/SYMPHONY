@@ -115,7 +115,7 @@ export default async function CorporateGiftingPage() {
   const productCards = corporateProducts.products.map((product: ProductWithRelations) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
-    image: product.images[0]?.url || "/images/fnp/products/gift01.webp",
+    images: product.images.map(img => img.url),
     href: `/shop/${product.slug}`,
   }));
   return (

@@ -56,7 +56,7 @@ export default async function ShopPage(props: {
   const productCards = products.map((product: ProductWithRelations, index: number) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
-    image: product.images[0]?.url || "/images/fnp/products/mugs.png",
+    images: product.images.map(img => img.url),
     href: `/shop/${product.slug}`,
     label: index === 0 && !categorySlug && !searchQuery && currentPage === 1 ? "Featured" : undefined,
   }));
