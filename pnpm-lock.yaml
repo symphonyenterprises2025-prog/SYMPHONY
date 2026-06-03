@@ -50,6 +50,9 @@ importers:
       '@symphony/notifications':
         specifier: workspace:*
         version: link:../../packages/notifications
+      axios:
+        specifier: ^1.7.0
+        version: 1.15.2
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
