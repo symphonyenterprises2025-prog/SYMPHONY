@@ -137,7 +137,7 @@ export function SiteHeader({ cartCount = 0 }: { cartCount?: number }) {
       </StorefrontContainer>
 
       <div className="border-t border-[#eee4d2] bg-gradient-to-r from-[#fbfaf6] via-[#f4f0e6] to-[#fbfaf6] px-4 py-3 text-center font-sans text-[0.95rem] font-semibold text-slate-900 sm:text-[1.05rem]">
-        Making Every Occasion Special Since 2010. Nationwide Delivery.
+        Making Every Occasion Special Since 2020. Nationwide Delivery.
       </div>
     </header>
   );

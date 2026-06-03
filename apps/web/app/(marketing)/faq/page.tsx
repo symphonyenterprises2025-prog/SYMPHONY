@@ -95,7 +95,7 @@ export default function FAQPage() {
                 { value: "24/7", label: "support access" },
                 { value: "50+", label: "delivery cities" },
                 { value: "10+", label: "gift formats" },
-                { value: "2010", label: "brand legacy" },
+                { value: "2020", label: "brand legacy" },
               ]}
             />
           </section>

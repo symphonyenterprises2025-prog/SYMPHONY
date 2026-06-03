@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { CURRENCY_SYMBOL } from './constants'
+
+const CURRENCY_SYMBOL = '₹'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

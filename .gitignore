@@ -45,3 +45,6 @@ coverage
 # Misc
 .cache
 .temp
+
+# OpenWA
+OpenWA/

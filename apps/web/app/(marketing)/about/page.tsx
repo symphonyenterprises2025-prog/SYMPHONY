@@ -83,7 +83,7 @@ export default function AboutPage() {
             <BrandedHero
               eyebrow="Inside Symphony Enterprise"
               title="A Bhubaneswar gifting studio built around memorable details."
-              description="Since 2010, Symphony Enterprise has focused on customized gifting, laser engraving, trophies, festive boxes, and corporate presentation pieces that look polished before they are opened."
+              description="Since 2020, Symphony Enterprise has focused on customized gifting, laser engraving, trophies, festive boxes, and corporate presentation pieces that look polished before they are opened."
               image="/images/fnp/banner/b19.jpg"
               actions={
                 <>
@@ -107,7 +107,7 @@ export default function AboutPage() {
           <section className="mt-8">
             <BrandStats
               items={[
-                { value: "2010", label: "since" },
+                { value: "2020", label: "since" },
                 { value: "500+", label: "custom products" },
                 { value: "50+", label: "cities served" },
                 { value: "24/7", label: "support" },

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, LucideIcon, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ProductImageRotator } from "./product-image-rotator";
 
 export function BrandWordmark({
   className,
@@ -248,27 +249,36 @@ export function BrandProductCard({
   name,
   price,
   image,
+  images,
   href,
   label,
 }: {
   name: string;
   price: number;
-  image: string;
+  image?: string;
+  images?: string[];
   href: string;
   label?: string;
 }) {
+  const allImages = images && images.length > 0 ? images : (image ? [image] : ["/images/fnp/products/gift01.webp"]);
+  const hasMultipleImages = allImages.length > 1;
+
   return (
     <div className="rounded-[1.6rem] border border-[#eadfca] bg-white p-2 shadow-[0_18px_40px_rgba(46,38,22,0.08)]">
       <Link href={href} className="group block">
         <div className="relative aspect-[1.02] overflow-hidden rounded-[1.15rem] bg-[#f7f2e8]">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          {hasMultipleImages ? (
+            <ProductImageRotator images={allImages} alt={name} />
+          ) : (
+            <Image
+              src={allImages[0]}
+              alt={name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          )}
           {label ? (
-            <span className="absolute left-3 top-3 rounded-full bg-[#1f3763] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
+            <span className="absolute left-3 top-3 z-10 rounded-full bg-[#1f3763] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
               {label}
             </span>
           ) : null}

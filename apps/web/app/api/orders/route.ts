@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { sendNotification, sendAdminAlert } from '@symphony/notifications'
 import { sendTransactionalEmail, sendAdminNotification } from '@/lib/email/brevo'
 import { getOrderConfirmationTemplate } from '@/lib/email/templates'
-import { initializeNotifications } from '@/lib/notifications'
 
 export async function GET(request: NextRequest) {
   try {

@@ -112,6 +112,16 @@ async function main() {
         sortOrder: 4,
       },
     }),
+    prisma.category.upsert({
+      where: { slug: 'customized-t-shirts' },
+      update: {},
+      create: {
+        name: 'Customized T-Shirts',
+        slug: 'customized-t-shirts',
+        description: 'Personalized T-shirts with photos, names, quotes, and custom prints',
+        sortOrder: 5,
+      },
+    }),
   ])
   console.log('✅ Categories created')
 
@@ -158,13 +168,83 @@ async function main() {
       },
     }),
     prisma.occasion.upsert({
+      where: { slug: 'holi' },
+      update: {},
+      create: {
+        name: 'Holi',
+        slug: 'holi',
+        description: 'Festival of colors gifts',
+        sortOrder: 5,
+      },
+    }),
+    prisma.occasion.upsert({
+      where: { slug: 'rakhi' },
+      update: {},
+      create: {
+        name: 'Rakhi',
+        slug: 'rakhi',
+        description: 'Raksha Bandhan gifts for brothers and sisters',
+        sortOrder: 6,
+      },
+    }),
+    prisma.occasion.upsert({
+      where: { slug: 'fathers-day' },
+      update: {},
+      create: {
+        name: "Father's Day",
+        slug: 'fathers-day',
+        description: 'Special gifts for fathers',
+        sortOrder: 7,
+      },
+    }),
+    prisma.occasion.upsert({
+      where: { slug: 'mothers-day' },
+      update: {},
+      create: {
+        name: "Mother's Day",
+        slug: 'mothers-day',
+        description: 'Special gifts for mothers',
+        sortOrder: 8,
+      },
+    }),
+    prisma.occasion.upsert({
+      where: { slug: 'valentines-day' },
+      update: {},
+      create: {
+        name: "Valentine's Day",
+        slug: 'valentines-day',
+        description: 'Romantic gifts for your loved one',
+        sortOrder: 9,
+      },
+    }),
+    prisma.occasion.upsert({
+      where: { slug: 'republic-day' },
+      update: {},
+      create: {
+        name: 'Republic Day',
+        slug: 'republic-day',
+        description: 'January 26th patriotic gifts',
+        sortOrder: 10,
+      },
+    }),
+    prisma.occasion.upsert({
+      where: { slug: 'bolbum' },
+      update: {},
+      create: {
+        name: 'Bolbum',
+        slug: 'bolbum',
+        description: 'Bolbum festival special gifts',
+        sortOrder: 11,
+      },
+    }),
+    prisma.occasion.upsert({
       where: { slug: 'congratulations' },
       update: {},
       create: {
         name: 'Congratulations',
         slug: 'congratulations',
         description: 'Recognition gifts for achievements',
-        sortOrder: 5,
+        sortOrder: 12,
       },
     }),
     prisma.occasion.upsert({
@@ -174,11 +254,60 @@ async function main() {
         name: 'Thank You',
         slug: 'thank-you',
         description: 'Express gratitude with thoughtful gifts',
-        sortOrder: 6,
+        sortOrder: 13,
       },
     }),
   ])
   console.log('✅ Occasions created')
+
+  // Create shop-by-categories
+  const shopByCategories = await Promise.all([
+    prisma.shopByCategory.upsert({
+      where: { slug: 'festivals' },
+      update: {},
+      create: {
+        name: 'Festivals',
+        slug: 'festivals',
+        type: 'festival',
+        description: 'Shop by festival - Diwali, Holi, Rakhi and more',
+        sortOrder: 1,
+      },
+    }),
+    prisma.shopByCategory.upsert({
+      where: { slug: 'occasions' },
+      update: {},
+      create: {
+        name: 'Occasions',
+        slug: 'occasions',
+        type: 'occasion',
+        description: 'Shop by occasion - Birthday, Anniversary, Wedding and more',
+        sortOrder: 2,
+      },
+    }),
+    prisma.shopByCategory.upsert({
+      where: { slug: 'offers' },
+      update: {},
+      create: {
+        name: 'Special Offers',
+        slug: 'offers',
+        type: 'offer',
+        description: 'Limited time offers and discounts',
+        sortOrder: 3,
+      },
+    }),
+    prisma.shopByCategory.upsert({
+      where: { slug: 'best-selling' },
+      update: {},
+      create: {
+        name: 'Best Selling',
+        slug: 'best-selling',
+        type: 'best-selling',
+        description: 'Our most popular products',
+        sortOrder: 4,
+      },
+    }),
+  ])
+  console.log('✅ Shop by categories created')
 
   // Create collections
   const collections = await Promise.all([

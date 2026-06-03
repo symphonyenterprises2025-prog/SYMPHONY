@@ -20,11 +20,17 @@ import {
   BrandSplitCallout,
   BrandStats,
   BrandVisualCard,
+  BrandProductCard,
   BrandedHero,
   SectionHeading,
   StorefrontCanvas,
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
+import { HeroRotator } from "@/components/storefront/hero-rotator";
+import { getCategories, getPaginatedProducts } from "@/features/catalog/queries";
+
+type Category = Awaited<ReturnType<typeof getCategories>>[number];
+type ProductWithRelations = Awaited<ReturnType<typeof getPaginatedProducts>>['products'][number];
 
 const serviceCards = [
   {
@@ -96,7 +102,22 @@ const process = [
   },
 ];
 
-export default function CorporateGiftingPage() {
+export default async function CorporateGiftingPage() {
+  const [categories, corporateProducts] = await Promise.all([
+    getCategories().catch(() => [] as Category[]),
+    getPaginatedProducts({ categorySlug: 'corporate-gifts', limit: 8 }).catch(() => ({ products: [], total: 0, totalPages: 0, currentPage: 1 })),
+  ]);
+
+  const corporateCategories = categories.filter((cat) => 
+    cat.slug === 'corporate-gifts' || cat.slug === 'personalized-gifts' || cat.slug === 'gift-hampers'
+  );
+
+  const productCards = corporateProducts.products.map((product: ProductWithRelations) => ({
+    name: product.name,
+    price: Number(product.variants[0]?.price || 0),
+    image: product.images[0]?.url || "/images/fnp/products/gift01.webp",
+    href: `/shop/${product.slug}`,
+  }));
   return (
     <StorefrontCanvas>
       <SiteHeader />
@@ -106,28 +127,48 @@ export default function CorporateGiftingPage() {
           <Breadcrumbs items={[{ label: "Corporate Gifting" }]} />
 
           <div className="mt-6">
-            <BrandedHero
-              eyebrow="Corporate Solutions"
-              title="Premium corporate gifting that looks considered, not mass-produced."
-              description="Symphony Enterprise helps businesses create branded gift sets, festive hampers, recognition pieces, and personalized presentation boxes that feel polished from unboxing to delivery."
-              image="/images/fnp/banner/b19.jpg"
-              actions={
-                <>
-                  <Link
-                    href="/contact"
-                    className="inline-flex h-12 items-center justify-center rounded-full bg-[#1f3763] px-7 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#172c53]"
-                  >
-                    Start an Inquiry
-                  </Link>
-                  <Link
-                    href="/shop"
-                    className="inline-flex h-12 items-center justify-center rounded-full border border-white/30 bg-white/10 px-7 text-sm font-semibold uppercase tracking-wide text-white backdrop-blur transition-colors hover:bg-white/20"
-                  >
-                    Browse Ready Categories
-                  </Link>
-                </>
-              }
-            />
+            <section className="relative overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_28px_70px_rgba(46,37,20,0.12)]">
+              <div className="relative min-h-[380px] sm:min-h-[460px]">
+                <HeroRotator
+                  images={[
+                    { url: "/images/fnp/banner/b19.jpg", alt: "Corporate Gifting Banner 1" },
+                    { url: "/images/fnp/banner/b20.jpg", alt: "Corporate Gifting Banner 2" },
+                  ]}
+                  interval={5000}
+                />
+                <div className="via-[#11345c]/48 absolute inset-0 bg-gradient-to-r from-[#081d34]/80 to-[#1f3763]/20" />
+                <div className="relative z-10 flex min-h-[380px] items-center px-6 py-10 sm:min-h-[460px] sm:px-10">
+                  <div className="max-w-3xl">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 font-sans text-sm font-semibold text-white backdrop-blur">
+                      <svg className="h-4 w-4 text-[#f5cf83]" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      Corporate Solutions
+                    </span>
+                    <h1 className="mt-5 font-sans text-[2.5rem] font-semibold leading-[1.02] tracking-tight text-white sm:text-[4rem]">
+                      Premium corporate gifting that looks considered, not mass-produced.
+                    </h1>
+                    <p className="mt-5 max-w-2xl font-sans text-base leading-7 text-white/85 sm:text-xl">
+                      Symphony Enterprise helps businesses create branded gift sets, festive hampers, recognition pieces, and personalized presentation boxes that feel polished from unboxing to delivery.
+                    </p>
+                    <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                      <Link
+                        href="/contact"
+                        className="inline-flex h-12 items-center justify-center rounded-full bg-[#1f3763] px-7 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#172c53]"
+                      >
+                        Start an Inquiry
+                      </Link>
+                      <Link
+                        href="/shop"
+                        className="inline-flex h-12 items-center justify-center rounded-full border border-white/30 bg-white/10 px-7 text-sm font-semibold uppercase tracking-wide text-white backdrop-blur transition-colors hover:bg-white/20"
+                      >
+                        Browse Ready Categories
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
           <section className="mt-8">
@@ -146,6 +187,51 @@ export default function CorporateGiftingPage() {
               <BrandInfoCard key={item.title} {...item} />
             ))}
           </section>
+
+          <section className="mt-10">
+            <SectionHeading
+              eyebrow="Browse by Category"
+              title="Corporate Gift Categories"
+              description="Explore our range of corporate gifting options organized by category."
+              align="center"
+            />
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
+              {corporateCategories.map((category) => (
+                <Link key={category.id} href={`/shop?category=${category.slug}`}>
+                  <BrandVisualCard
+                    title={category.name}
+                    description={category.description || ''}
+                    image="/images/fnp/products/gift01.webp"
+                    href={`/shop?category=${category.slug}`}
+                  />
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {corporateProducts.products.length > 0 && (
+            <section className="mt-10">
+              <SectionHeading
+                eyebrow="Featured Products"
+                title="Corporate Gift Collection"
+                description="Premium products perfect for corporate gifting and recognition."
+                align="center"
+              />
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {productCards.map((product) => (
+                  <BrandProductCard key={product.href} {...product} />
+                ))}
+              </div>
+              <div className="mt-8 text-center">
+                <Link
+                  href="/shop?category=corporate-gifts"
+                  className="inline-flex h-12 items-center justify-center rounded-full bg-[#1f3763] px-8 text-sm font-semibold uppercase tracking-wide text-white hover:bg-[#172c53]"
+                >
+                  View All Corporate Gifts
+                </Link>
+              </div>
+            </section>
+          )}
 
           <section className="mt-10 grid gap-8 xl:grid-cols-[1.02fr_0.98fr]">
             <div className="rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_24px_60px_rgba(45,36,20,0.1)] sm:p-8">
