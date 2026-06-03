@@ -10,29 +10,32 @@ import {
   StorefrontCanvas,
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
-import { getProducts, getCollections } from "@/features/catalog/queries";
+import { HeroRotator } from "@/components/storefront/hero-rotator";
+import { getProducts, getShopByCategories } from "@/features/catalog/queries";
 
 type ProductWithRelations = Awaited<ReturnType<typeof getProducts>>[number];
-type Collection = Awaited<ReturnType<typeof getCollections>>[number];
+type ShopByCategory = Awaited<ReturnType<typeof getShopByCategories>>[number];
 
 export default async function HomePage() {
-  const [products, collections] = await Promise.all([
+  const [products, shopByCategories] = await Promise.all([
     getProducts({ limit: 8 }).catch(() => [] as ProductWithRelations[]),
-    getCollections().catch(() => [] as Collection[]),
+    getShopByCategories().catch(() => [] as ShopByCategory[]),
   ]);
 
   const productCards = products.slice(0, 8).map((product: ProductWithRelations) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
-    image: product.images[0]?.url || "/images/fnp/products/gift01.webp",
+    images: product.images.map(img => img.url),
     href: `/shop/${product.slug}`,
   }));
 
-  const collectionCards = collections.slice(0, 4).map((collection: Collection) => ({
-    title: collection.name,
-    description: collection.description,
-    image: "/images/fnp/products/gift01.webp",
-    href: `/collections/${collection.slug}`,
+  const shopByCategoryCards = shopByCategories.slice(0, 4).map((item: ShopByCategory) => ({
+    title: item.name,
+    description: item.description,
+    image: item.image || "/images/fnp/products/gift01.webp",
+    href: item.category ? `/shop?category=${item.category.slug}` : 
+           item.collection ? `/shop?collection=${item.collection.slug}` :
+           item.occasion ? `/occasions/${item.occasion.slug}` : '/shop',
   }));
 
   return (
@@ -42,12 +45,49 @@ export default async function HomePage() {
       <main className="pb-16 pt-8">
         <StorefrontContainer>
           <div className="mt-6">
-            <BrandedHero
-              eyebrow="India's Premium Gifting Destination"
-              title="Make Every Moment Memorable with Symphony"
-              description="Discover personalized gifts, curated hampers, and corporate gifting solutions across India. From custom engravings to premium hampers, we help you celebrate every occasion in style."
-              image="/images/fnp/banner/b19.jpg"
-            />
+            <section className="relative overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_28px_70px_rgba(46,37,20,0.12)]">
+              <div className="relative min-h-[380px] sm:min-h-[460px]">
+                <HeroRotator
+                  images={[
+                    { url: "/images/fnp/banner/b19.jpg", alt: "Symphony Gifts Banner 1" },
+                    { url: "/images/fnp/banner/b20.jpg", alt: "Symphony Gifts Banner 2" },
+                    { url: "/images/fnp/banner/b16.jpg", alt: "Symphony Gifts Banner 3" },
+                  ]}
+                  interval={5000}
+                />
+                <div className="via-[#11345c]/48 absolute inset-0 bg-gradient-to-r from-[#081d34]/80 to-[#1f3763]/20" />
+                <div className="relative z-10 flex min-h-[380px] items-center px-6 py-10 sm:min-h-[460px] sm:px-10">
+                  <div className="max-w-3xl">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 font-sans text-sm font-semibold text-white backdrop-blur">
+                      <svg className="h-4 w-4 text-[#f5cf83]" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      India's Premium Gifting Destination
+                    </span>
+                    <h1 className="mt-5 font-sans text-[2.5rem] font-semibold leading-[1.02] tracking-tight text-white sm:text-[4rem]">
+                      Make Every Moment Memorable with Symphony
+                    </h1>
+                    <p className="mt-5 max-w-2xl font-sans text-base leading-7 text-white/85 sm:text-xl">
+                      Discover personalized gifts, curated hampers, and corporate gifting solutions across India. From custom engravings to premium hampers, we help you celebrate every occasion in style.
+                    </p>
+                    <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                      <Link
+                        href="/shop"
+                        className="inline-flex h-12 items-center justify-center rounded-full bg-[#1f3763] px-8 text-sm font-semibold uppercase tracking-wide text-white hover:bg-[#172c53]"
+                      >
+                        Shop Now
+                      </Link>
+                      <Link
+                        href="/customized-t-shirts"
+                        className="inline-flex h-12 items-center justify-center rounded-full border border-[#d0b57a] bg-white px-6 text-sm font-semibold uppercase tracking-wide text-slate-900 hover:bg-[#f8f2e5]"
+                      >
+                        Customize Gifts
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
           <section className="mt-8">
@@ -68,7 +108,7 @@ export default async function HomePage() {
               description="Explore our curated collections designed to make your gifting experience memorable and special."
             />
             <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-              {collectionCards.map((tile: any) => (
+              {shopByCategoryCards.map((tile: any) => (
                 <BrandVisualCard key={tile.title} {...tile} />
               ))}
             </div>

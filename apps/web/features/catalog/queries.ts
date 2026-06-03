@@ -124,65 +124,22 @@ export async function getOccasions() {
   )()
 }
 
-export async function getBlogPosts() {
+export async function getShopByCategories() {
   return unstable_cache(
     async () => {
-      return prisma.blogPost.findMany({
-        where: { isPublished: true },
-        orderBy: { publishedAt: 'desc' },
-        take: 10,
-      })
-    },
-    ['blog-posts'],
-    {
-      tags: [CACHE_TAGS.products],
-      revalidate: 3600,
-    }
-  )()
-}
-
-export async function getBlogPostBySlug(slug: string) {
-  return unstable_cache(
-    async () => {
-      return prisma.blogPost.findUnique({
-        where: { slug, isPublished: true },
-      })
-    },
-    [`blog-post-${slug}`],
-    {
-      tags: [CACHE_TAGS.products],
-      revalidate: 3600,
-    }
-  )()
-}
-
-export async function getBanners(position?: string) {
-  return unstable_cache(
-    async () => {
-      return prisma.banner.findMany({
-        where: { isActive: true, position: position || undefined },
-        orderBy: { sortOrder: 'asc' },
-      })
-    },
-    ['banners'],
-    {
-      tags: [CACHE_TAGS.products],
-      revalidate: 3600,
-    }
-  )()
-}
-
-export async function getTestimonials() {
-  return unstable_cache(
-    async () => {
-      return prisma.testimonial.findMany({
+      return prisma.shopByCategory.findMany({
         where: { isActive: true },
+        include: {
+          category: true,
+          collection: true,
+          occasion: true,
+        },
         orderBy: { sortOrder: 'asc' },
       })
     },
-    ['testimonials'],
+    ['shop-by-categories'],
     {
-      tags: [CACHE_TAGS.products],
+      tags: [CACHE_TAGS.categories],
       revalidate: 3600,
     }
   )()

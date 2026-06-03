@@ -11,7 +11,7 @@ import {
   StorefrontCanvas,
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
-import { getBlogPosts } from "@/features/catalog/queries";
+import { getBlogPosts } from "@/features/content/queries";
 
 // Type inferred from getBlogPosts return type
 type BlogPost = Awaited<ReturnType<typeof getBlogPosts>>[number];
