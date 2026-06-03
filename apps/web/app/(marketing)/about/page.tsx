@@ -56,17 +56,17 @@ const showcase = [
   {
     title: "Corporate and festive gifting",
     description: "Curated boxes, personalized sets, and presentation-led gift packaging.",
-    image: "/images/fnp/products/gift01.webp",
+    image: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80",
   },
   {
     title: "Laser engraving and recognition",
     description: "Awards, desk pieces, and memorable engraved products for teams and milestones.",
-    image: "/images/fnp/products/gift22.webp",
+    image: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&q=80",
   },
   {
     title: "Photo keepsakes and occasion gifts",
     description: "Frames, mugs, hampers, and celebration-led pieces built for emotional impact.",
-    image: "/images/fnp/products/gift24.webp",
+    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80",
   },
 ];
 
@@ -84,7 +84,7 @@ export default function AboutPage() {
               eyebrow="Inside Symphony Enterprise"
               title="A Bhubaneswar gifting studio built around memorable details."
               description="Since 2020, Symphony Enterprise has focused on customized gifting, laser engraving, trophies, festive boxes, and corporate presentation pieces that look polished before they are opened."
-              image="/images/fnp/banner/b19.jpg"
+              image="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=1200&q=80"
               actions={
                 <>
                   <Link
@@ -157,7 +157,7 @@ export default function AboutPage() {
             <div className="overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
               <div className="relative min-h-[280px] border-b border-[#eadfca]">
                 <Image
-                  src="/images/fnp/products/gift15.webp"
+                  src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80"
                   alt="Symphony gifting showcase"
                   fill
                   className="object-cover"

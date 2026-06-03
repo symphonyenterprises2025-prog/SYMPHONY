@@ -58,20 +58,20 @@ const useCases = [
     title: "Employee appreciation kits",
     description:
       "Onboarding boxes, festive gifts, and recognition sets that feel premium without looking generic.",
-    image: "/images/fnp/products/gift01.webp",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80",
     href: "/contact",
   },
   {
     title: "Client and partner gifting",
     description: "Polished branded sets for relationship-building, launches, and premium outreach.",
-    image: "/images/fnp/products/gift11.webp",
+    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80",
     href: "/contact",
   },
   {
     title: "Awards and event recognition",
     description:
       "Laser engraved trophies, plaques, and commemorative pieces for ceremonies and milestones.",
-    image: "/images/fnp/products/gift22.webp",
+    image: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&q=80",
     href: "/contact",
   },
 ];
@@ -201,7 +201,9 @@ export default async function CorporateGiftingPage() {
                   <BrandVisualCard
                     title={category.name}
                     description={category.description || ''}
-                    image="/images/fnp/products/gift01.webp"
+                    image={category.slug === 'corporate-gifts' ? 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80' : 
+                           category.slug === 'personalized-gifts' ? 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80' :
+                           'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80'}
                     href={`/shop?category=${category.slug}`}
                   />
                 </Link>
@@ -284,7 +286,7 @@ export default async function CorporateGiftingPage() {
             <div className="overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
               <div className="relative min-h-[320px]">
                 <Image
-                  src="/images/fnp/products/gift15.webp"
+                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80"
                   alt="Corporate gifting hero"
                   fill
                   className="object-cover"

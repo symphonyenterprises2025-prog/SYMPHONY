@@ -15,13 +15,26 @@ import { getCollections } from "@/features/catalog/queries";
 // Type inferred from query return
 type Collection = Awaited<ReturnType<typeof getCollections>>[number];
 
+// Collection-specific image mapping
+const getCollectionImage = (slug: string): string => {
+  const imageMap: Record<string, string> = {
+    'gift-hampers': 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80',
+    'personalized-gifts': 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80',
+    'corporate-sets': 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80',
+    'awards-recognition': 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&q=80',
+    'anniversary-stories': 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&q=80',
+    'festival-specials': 'https://images.unsplash.com/photo-1606841837239-c5a1a4a07ad7?w=800&q=80',
+  };
+  return imageMap[slug] || 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80';
+};
+
 export default async function CollectionsPage() {
   const collections = await getCollections().catch(() => [] as Collection[]);
 
   const collectionCards = collections.map((collection: Collection) => ({
     title: collection.name,
     description: collection.description || "",
-    image: "/images/fnp/products/gift01.webp",
+    image: getCollectionImage(collection.slug),
     href: `/collections/${collection.slug}`,
   }));
 
