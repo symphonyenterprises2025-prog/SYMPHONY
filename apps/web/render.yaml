@@ -4,10 +4,12 @@ services:
     runtime: node
     plan: free
     buildCommand: pnpm install --no-frozen-lockfile && pnpm run build
-    startCommand: cd prisma && pnpm exec tsx seed-admin.ts && cd .. && pnpm start
+    startCommand: pnpm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=384
       - key: DATABASE_URL
         sync: false
       - key: NEXTAUTH_SECRET
