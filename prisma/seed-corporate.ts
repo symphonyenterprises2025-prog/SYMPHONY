@@ -1,12 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL || 'postgresql://postgres:dwnCfCfb%23CT4gJ&@db.ozuoxykvcfeeylszacoj.supabase.co:5432/postgres'
-    }
-  }
-})
+const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Starting Corporate Gifts seed...')
@@ -17,13 +11,13 @@ async function main() {
     update: {
       name: 'Corporate Gifts',
       description: 'Premium corporate gifting solutions, hampers, and kits.',
-      image: '/images/fnp/corporate/welcome-kits.jpg',
+      image: '/images/fnp/products/gift01.webp',
     },
     create: {
       name: 'Corporate Gifts',
       slug: 'corporate-gifts',
       description: 'Premium corporate gifting solutions, hampers, and kits.',
-      image: '/images/fnp/corporate/welcome-kits.jpg',
+      image: '/images/fnp/products/gift01.webp',
       sortOrder: 2,
     },
   })
@@ -34,7 +28,7 @@ async function main() {
       title: "Festive Hampers",
       slug: "festive-hampers",
       description: "Curated gift hampers for Diwali, Christmas and other festive occasions.",
-      image: "/images/fnp/corporate/hampers.jpg",
+      image: "/images/fnp/products/gift02.webp",
       sortOrder: 1
     },
     {
@@ -48,28 +42,28 @@ async function main() {
       title: "Awards & Recognition",
       slug: "awards",
       description: "Long service awards and employee appreciation gifts.",
-      image: "/images/fnp/corporate/awards.jpg",
+      image: "/images/fnp/products/gift22.webp",
       sortOrder: 3
     },
     {
       title: "Diwali Gifts",
       slug: "corporate-diwali",
       description: "Traditional sweets, dry fruits, and auspicious gifts for Diwali.",
-      image: "/images/fnp/corporate/diwali.jpg",
+      image: "/images/fnp/products/gift16.webp",
       sortOrder: 4
     },
     {
       title: "Christmas Gifts",
       slug: "corporate-christmas",
       description: "Year-end gifting solutions and secret santa presents.",
-      image: "/images/fnp/corporate/christmas.jpg",
+      image: "/images/fnp/products/gift15.webp",
       sortOrder: 5
     },
     {
       title: "Promotional Gifts",
       slug: "promotional-gifts",
       description: "Branded merchandise and customized event giveaways.",
-      image: "/images/fnp/corporate/promotional.jpg",
+      image: "/images/fnp/products/gift05.webp",
       sortOrder: 6
     }
   ]
@@ -108,7 +102,7 @@ async function main() {
       shortDesc: "Functional office utility kit.",
       categorySlug: "welcome-kits",
       price: 1499,
-      images: ["/images/fnp/corporate/utility-pack.jpg"]
+      images: ["/images/fnp/products/mugs.png"]
     },
     {
       name: "Eco Chic Hamper",
@@ -117,7 +111,7 @@ async function main() {
       shortDesc: "Sustainable, eco-friendly gift hamper.",
       categorySlug: "festive-hampers",
       price: 1899,
-      images: ["/images/fnp/corporate/eco-chic.jpg"]
+      images: ["/images/fnp/products/gift01.webp"]
     },
     {
       name: "Let's Go Copper Kit",
@@ -126,7 +120,7 @@ async function main() {
       shortDesc: "Premium wellness copper kit.",
       categorySlug: "awards",
       price: 2499,
-      images: ["/images/fnp/corporate/copper-kit.jpg"]
+      images: ["/images/fnp/products/gift15.webp"]
     },
     {
       name: "The Brown Collection",
@@ -135,7 +129,7 @@ async function main() {
       shortDesc: "Premium leather portfolio collection.",
       categorySlug: "awards",
       price: 3499,
-      images: ["/images/fnp/corporate/brown-collection.jpg"]
+      images: ["/images/fnp/products/gift24.webp"]
     },
     {
       name: "Diwali Dry Fruit Tray",
@@ -144,7 +138,7 @@ async function main() {
       shortDesc: "Premium mixed dry fruits tray.",
       categorySlug: "corporate-diwali",
       price: 1299,
-      images: ["/images/fnp/corporate/diwali.jpg"]
+      images: ["/images/fnp/products/gift16.webp"]
     },
     {
       name: "Corporate Christmas Treat Box",
@@ -153,7 +147,7 @@ async function main() {
       shortDesc: "Festive plum cake & chocolate box.",
       categorySlug: "corporate-christmas",
       price: 999,
-      images: ["/images/fnp/corporate/christmas.jpg"]
+      images: ["/images/fnp/products/gift23.webp"]
     },
     {
       name: "Personalized Corporate Diary & Pen",
@@ -162,7 +156,7 @@ async function main() {
       shortDesc: "Customizable event merchandise set.",
       categorySlug: "promotional-gifts",
       price: 599,
-      images: ["/images/fnp/corporate/promotional.jpg"]
+      images: ["/images/fnp/products/gift02.webp"]
     },
     {
       name: "Welcome to the Team Kit",
@@ -171,7 +165,7 @@ async function main() {
       shortDesc: "Complete new employee greeting kit.",
       categorySlug: "welcome-kits",
       price: 1199,
-      images: ["/images/fnp/corporate/welcome-kits.jpg"]
+      images: ["/images/fnp/products/gift11.webp"]
     }
   ]
 
