@@ -32,7 +32,7 @@ export default async function HomePage() {
   const shopByCategoryCards = shopByCategories.slice(0, 4).map((item: ShopByCategory) => ({
     title: item.name,
     description: item.description,
-    image: item.image || "/images/fnp/products/gift01.webp",
+    image: item.image || "/images/collections/gift-hampers.jpg",
     href: item.category ? `/shop?category=${item.category.slug}` : 
            item.collection ? `/shop?collection=${item.collection.slug}` :
            item.occasion ? `/occasions/${item.occasion.slug}` : '/shop',
@@ -49,9 +49,9 @@ export default async function HomePage() {
               <div className="relative min-h-[380px] sm:min-h-[460px]">
                 <HeroRotator
                   images={[
-                    { url: "/images/fnp/banner/b19.jpg", alt: "Symphony Gifts Banner 1" },
-                    { url: "/images/fnp/banner/b20.jpg", alt: "Symphony Gifts Banner 2" },
-                    { url: "/images/fnp/banner/b16.jpg", alt: "Symphony Gifts Banner 3" },
+                    { url: "/images/home/banner1.jpg", alt: "Symphony Gifts Banner 1" },
+                    { url: "/images/home/banner2.jpg", alt: "Symphony Gifts Banner 2" },
+                    { url: "/images/home/banner3.jpg", alt: "Symphony Gifts Banner 3" },
                   ]}
                   interval={5000}
                 />

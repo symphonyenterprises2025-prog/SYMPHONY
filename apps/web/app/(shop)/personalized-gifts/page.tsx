@@ -54,7 +54,7 @@ export default async function PersonalizedGiftsPage() {
     .map((c: Category) => ({
       title: c.name,
       description: c.description || "",
-      image: c.image || "/images/fnp/products/mugs.png",
+      image: c.image || "/images/collections/personalized-gifts.jpg",
       href: `/shop?category=${c.slug}`,
     }));
   return (
@@ -70,8 +70,8 @@ export default async function PersonalizedGiftsPage() {
               <div className="relative min-h-[380px] sm:min-h-[460px]">
                 <HeroRotator
                   images={[
-                    { url: "/images/fnp/banner/b1.jpg", alt: "Personalized Gifts Banner 1" },
-                    { url: "/images/fnp/banner/b2.jpg", alt: "Personalized Gifts Banner 2" },
+                    { url: "/images/personalized/banner1.jpg", alt: "Personalized Gifts Banner 1" },
+                    { url: "/images/personalized/banner2.jpg", alt: "Personalized Gifts Banner 2" },
                   ]}
                   interval={5000}
                 />
@@ -138,7 +138,7 @@ export default async function PersonalizedGiftsPage() {
             <div className="overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
               <div className="relative min-h-[420px]">
                 <Image
-                  src="/images/fnp/products/tabletops.png"
+                  src="/images/personalized/highlight.jpg"
                   alt="Personalized gift highlight"
                   fill
                   className="object-cover"
