@@ -18,14 +18,14 @@ type Collection = Awaited<ReturnType<typeof getCollections>>[number];
 // Collection-specific image mapping
 const getCollectionImage = (slug: string): string => {
   const imageMap: Record<string, string> = {
-    'gift-hampers': 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80',
-    'personalized-gifts': 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80',
-    'corporate-sets': 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80',
-    'awards-recognition': 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&q=80',
-    'anniversary-stories': 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&q=80',
-    'festival-specials': 'https://images.unsplash.com/photo-1606841837239-c5a1a4a07ad7?w=800&q=80',
+    'gift-hampers': '/images/collections/gift-hampers.jpg',
+    'personalized-gifts': '/images/collections/personalized-gifts.jpg',
+    'corporate-sets': '/images/collections/corporate-sets.jpg',
+    'awards-recognition': '/images/collections/awards-recognition.jpg',
+    'anniversary-stories': '/images/collections/anniversary-stories.jpg',
+    'festival-specials': '/images/collections/festival-specials.jpg',
   };
-  return imageMap[slug] || 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80';
+  return imageMap[slug] || '/images/collections/gift-hampers.jpg';
 };
 
 export default async function CollectionsPage() {

@@ -18,21 +18,21 @@ type Occasion = Awaited<ReturnType<typeof getOccasions>>[number];
 // Occasion-specific image mapping
 const getOccasionImage = (slug: string): string => {
   const imageMap: Record<string, string> = {
-    'birthday': 'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=800&q=80',
-    'anniversary': 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&q=80',
-    'wedding': 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80',
-    'diwali': 'https://images.unsplash.com/photo-1606841837239-c5a1a4a07ad7?w=800&q=80',
-    'holi': 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=800&q=80',
-    'rakhi': 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80',
-    'fathers-day': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80',
-    'mothers-day': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',
-    'valentines-day': 'https://images.unsplash.com/photo-1518199266791-5375a8e90d61?w=800&q=80',
-    'republic-day': 'https://images.unsplash.com/photo-1561164154-9de4bf5b5789?w=800&q=80',
-    'bolbum': 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&q=80',
-    'congratulations': 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80',
-    'thank-you': 'https://images.unsplash.com/photo-1518176258769-f227c798150e?w=800&q=80',
+    'birthday': '/images/occasions/birthday.jpg',
+    'anniversary': '/images/occasions/anniversary.jpg',
+    'wedding': '/images/occasions/wedding.jpg',
+    'diwali': '/images/occasions/diwali.jpg',
+    'holi': '/images/occasions/holi.jpg',
+    'rakhi': '/images/occasions/rakhi.jpg',
+    'fathers-day': '/images/occasions/fathers-day.jpg',
+    'mothers-day': '/images/occasions/mothers-day.jpg',
+    'valentines-day': '/images/occasions/valentines-day.jpg',
+    'republic-day': '/images/occasions/republic-day.jpg',
+    'bolbum': '/images/occasions/bolbum.jpg',
+    'congratulations': '/images/occasions/congratulations.jpg',
+    'thank-you': '/images/occasions/thank-you.jpg',
   };
-  return imageMap[slug] || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80';
+  return imageMap[slug] || '/images/occasions/birthday.jpg';
 };
 
 export default async function OccasionsPage() {

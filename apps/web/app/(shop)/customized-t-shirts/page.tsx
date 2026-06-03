@@ -75,7 +75,7 @@ export default async function CustomizedTShirtsPage() {
               eyebrow="T-Shirt Personalization"
               title="Design Your Own Custom T-Shirts"
               description="Create unique T-shirts with photos, names, quotes, anime characters, god prints, and custom designs. Perfect for personal use, events, and gifting."
-              image="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&q=80"
+              image="/images/tshirts/custom-tshirt.jpg"
               actions={
                 <Link
                   href="/shop?category=customized-t-shirts"

@@ -91,7 +91,7 @@ export default function ContactPage() {
               eyebrow="Let us help you plan it"
               title="Contact Symphony for gifting, personalization, and corporate orders."
               description="Use the form for detailed inquiries, or reach out directly for fast help on design proofs, pricing, delivery timelines, and bulk customization."
-              image="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1200&q=80"
+              image="/images/contact/hero.jpg"
               actions={
                 <>
                   <a
