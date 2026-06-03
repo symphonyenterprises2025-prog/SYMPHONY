@@ -85,7 +85,8 @@ export default async function ShopPage(props: {
     if (collectionSlug) params.set("collection", collectionSlug);
     if (searchQuery) params.set("q", searchQuery);
     if (sortOption !== "newest") params.set("sort", sortOption);
-    if (currentPage > 1) params.set("page", currentPage.toString());
+    // Only set current page if not being updated
+    if (!updates.page && currentPage > 1) params.set("page", currentPage.toString());
 
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null) {
