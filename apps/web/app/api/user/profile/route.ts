@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { sendAdminNotification } from "@/lib/email/brevo";
 
 export async function PATCH(request: Request) {
   try {
@@ -41,6 +42,24 @@ export async function PATCH(request: Request) {
       }
 
       updateData.password = await bcrypt.hash(newPassword, 10);
+
+      // Send notification if admin changes their password
+      if (user.role === 'ADMIN') {
+        try {
+          await sendAdminNotification(
+            '🔐 Admin Password Changed',
+            `<div style="font-family:sans-serif;padding:20px;max-width:600px;margin:0 auto;">
+              <h2 style="color:#1f3763;">Admin Password Changed</h2>
+              <p>The admin password for <strong>${user.email}</strong> was just updated.</p>
+              <p style="color:#666;font-size:14px;">If you did not make this change, please secure your account immediately.</p>
+              <hr style="border:none;border-top:1px solid #eee;margin:20px 0;" />
+              <p style="color:#999;font-size:12px;">Symphony Enterprise - Security Notification</p>
+            </div>`
+          );
+        } catch (emailError) {
+          console.error('Failed to send admin password change notification:', emailError);
+        }
+      }
     }
 
     const updatedUser = await prisma.user.update({

@@ -66,14 +66,14 @@ export async function sendTransactionalEmail(
   })
 }
 
+const ADMIN_EMAIL = 'symphonyenterprise2025@gmail.com'
+
 export async function sendAdminNotification(
   subject: string,
   htmlContent: string
 ): Promise<{ messageId: string }> {
-  const adminEmail = process.env.ADMIN_EMAIL || 'symphonyenterprise2025@gmail.com'
-  
   return sendEmail({
-    to: [{ email: adminEmail, name: 'Admin' }],
+    to: [{ email: ADMIN_EMAIL, name: 'Admin' }],
     subject,
     htmlContent,
   })
