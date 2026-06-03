@@ -191,7 +191,7 @@ export default async function CustomizedTShirtsPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-slate-950">Place Order</h3>
-                    <p className="mt-1 text-sm text-slate-600">Review and checkout - we'll print and deliver</p>
+                    <p className="mt-1 text-sm text-slate-600">Review and checkout - we&apos;ll print and deliver</p>
                   </div>
                 </div>
               </div>
