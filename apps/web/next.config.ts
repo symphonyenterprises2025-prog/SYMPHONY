@@ -18,8 +18,6 @@ const nextConfig: NextConfig = {
   compress: true,
   // Disable source maps in production to reduce memory
   productionBrowserSourceMaps: false,
-  // Reduce memory usage
-  swcMinify: true,
   // Experimental optimizations for memory
   experimental: {
     // Disable worker threads to reduce memory
