@@ -3,7 +3,7 @@ services:
     name: symphony-ecommerce
     runtime: node
     plan: free
-    buildCommand: pnpm install --no-frozen-lockfile && pnpm run build
+    buildCommand: pnpm install --no-frozen-lockfile && pnpm --filter prisma exec tsx seed-admin.ts && pnpm run build
     startCommand: pnpm start
     envVars:
       - key: NODE_ENV
