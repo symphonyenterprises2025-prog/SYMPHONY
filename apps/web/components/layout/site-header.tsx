@@ -12,6 +12,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "Shop By Occasion", href: "/occasions" },
+  { label: "T-Shirts", href: "/customized-t-shirts" },
   { label: "Corporate Gifts", href: "/corporate-gifting" },
   { label: "Collections", href: "/collections" },
   { label: "Personalized", href: "/personalized-gifts" },
