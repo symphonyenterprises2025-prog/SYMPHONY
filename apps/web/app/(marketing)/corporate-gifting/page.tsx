@@ -131,8 +131,8 @@ export default async function CorporateGiftingPage() {
               <div className="relative min-h-[380px] sm:min-h-[460px]">
                 <HeroRotator
                   images={[
-                    { url: "/images/fnp/banner/b19.jpg", alt: "Corporate Gifting Banner 1" },
-                    { url: "/images/fnp/banner/b20.jpg", alt: "Corporate Gifting Banner 2" },
+                    { url: "/images/corporate/meeting.jpg", alt: "Corporate Gifting Banner 1" },
+                    { url: "/images/corporate/employee-kits.jpg", alt: "Corporate Gifting Banner 2" },
                   ]}
                   interval={5000}
                 />

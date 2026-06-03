@@ -10,8 +10,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Reduce memory usage during build
-  swcMinify: true,
   // Optimize for production
   compress: true,
   // Disable source maps in production to reduce memory
