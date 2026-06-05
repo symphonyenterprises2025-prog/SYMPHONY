@@ -17,7 +17,7 @@ const registerSchema = z.object({
 export async function POST(request: Request) {
   try {
     const ip = request.headers.get("x-forwarded-for") || "unknown";
-    const rl = rateLimit(`register:${ip}`, 3, 60 * 1000);
+    const rl = await rateLimit(`register:${ip}`, 3, 60 * 1000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many attempts. Please try again later." },

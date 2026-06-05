@@ -10,9 +10,20 @@ export async function createBlogPost(data: {
   content: string
   coverImage?: string
   author?: string
+  isPublished?: boolean
+  publishedAt?: Date | null
 }) {
   const post = await prisma.blogPost.create({
-    data,
+    data: {
+      title: data.title,
+      slug: data.slug,
+      excerpt: data.excerpt,
+      content: data.content,
+      coverImage: data.coverImage,
+      author: data.author,
+      isPublished: data.isPublished ?? false,
+      publishedAt: data.publishedAt ?? null,
+    },
   })
 
   revalidateBlog()

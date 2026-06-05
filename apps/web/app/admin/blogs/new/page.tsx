@@ -37,7 +37,7 @@ export default function NewBlogPage() {
         author,
         isPublished,
         publishedAt: isPublished ? new Date() : null,
-      } as any)
+      })
       router.push('/admin/blogs')
     } catch (err: any) {
       setError(err.message || 'Failed to create blog post')

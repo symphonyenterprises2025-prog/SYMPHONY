@@ -1,31 +1,40 @@
 import type { NextConfig } from 'next'
 
+const ALLOWED_REMOTE_IMAGE_HOSTS = [
+  'ozuoxykvcfeeylszacoj.supabase.co',
+  'images.unsplash.com',
+  'cdn.symphonyenterprise.co.in',
+  'symphonyenterprise.co.in',
+  'fnp.symphonyenterprise.co.in',
+]
+
 const nextConfig: NextConfig = {
-  // Disable standalone output for free tier - it increases memory usage
-  // output: 'standalone',
+  output: 'standalone',
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-    // Optimize image loading
-    formats: ['image/webp'],
+    remotePatterns: ALLOWED_REMOTE_IMAGE_HOSTS.map((hostname) => ({
+      protocol: 'https',
+      hostname,
+    })),
+    formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
   },
-  // Optimize for production
   compress: true,
-  // Disable source maps in production to reduce memory
   productionBrowserSourceMaps: false,
-  // Experimental optimizations for memory
   experimental: {
-    // Disable worker threads to reduce memory
-    workerThreads: false,
-    // Limit CPU usage
-    cpus: 1,
-    // Optimize package imports
     optimizePackageImports: ['lucide-react'],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ]
   },
 }
 

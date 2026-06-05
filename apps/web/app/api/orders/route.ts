@@ -4,6 +4,21 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { sendTransactionalEmail, sendAdminNotification } from '@/lib/email/brevo'
 import { getOrderConfirmationTemplate } from '@/lib/email/templates'
+import type { Order, OrderItem, Address } from '@prisma/client'
+
+class OrderError extends Error {
+  status: number
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = 'OrderError'
+    this.status = status
+  }
+}
+
+type OrderWithItemsAndAddress = Order & {
+  items: OrderItem[]
+  address: Address | null
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -175,50 +190,90 @@ export async function POST(request: NextRequest) {
     const total = subtotal + shippingCost + giftWrappingCost + tax - discount
     const orderNumber = `SYM-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`
 
-    const order = await prisma.$transaction(async (tx) => {
-      const newOrder = await tx.order.create({
-        data: {
-          orderNumber,
-          customerEmail,
-          customerName,
-          customerPhone,
-          subtotal,
-          shippingCost,
-          tax,
-          discount,
-          total,
-          notes,
-          giftMessage,
-          isGiftWrapped,
-          status: 'PENDING',
-          ...(couponId ? { coupon: { connect: { id: couponId } } } : {}),
-          items: { create: orderItemsData },
-          address: shippingAddress ? {
-            create: {
-              firstName: shippingAddress.firstName || '',
-              lastName: shippingAddress.lastName || '',
-              address1: shippingAddress.address1 || shippingAddress.address || '',
-              city: shippingAddress.city || '',
-              state: shippingAddress.state || '',
-              postalCode: shippingAddress.postalCode || shippingAddress.pincode || '',
-              country: 'India',
-              phone: customerPhone,
-              user: { connect: { id: session.user?.id } },
-            },
-          } : undefined,
-        },
-        include: { items: true, address: true },
-      })
-
-      for (const item of orderItemsData) {
-        await tx.productVariant.update({
-          where: { id: item.variantId },
-          data: { stock: { decrement: item.quantity } },
+    // Race-safe stock check + decrement. The conditional `updateMany` only
+    // decrements when `stock >= quantity`, so two parallel orders can't both
+    // pass the pre-check and oversell. The whole block runs inside a single
+    // serializable transaction.
+    const order = await prisma.$transaction(
+      async (tx) => {
+        // Re-validate stock inside the transaction (defence in depth).
+        const freshVariants = await tx.productVariant.findMany({
+          where: { id: { in: variantIds } },
+          select: { id: true, stock: true, isActive: true, name: true, product: { select: { name: true } } },
         })
-      }
+        for (const item of items) {
+          const v = freshVariants.find((fv) => fv.id === item.variantId)
+          if (!v) {
+            throw new OrderError(`Variant ${item.variantId} not found`, 400)
+          }
+          if (!v.isActive) {
+            throw new OrderError(`${v.product.name} - ${v.name} is no longer available`, 400)
+          }
+          if (v.stock < item.quantity) {
+            throw new OrderError(
+              `Insufficient stock for ${v.product.name} - ${v.name}. Available: ${v.stock}`,
+              400
+            )
+          }
+        }
 
-      return newOrder
-    })
+        // Atomic conditional decrement. If the predicate fails (another tx
+        // grabbed the stock), updateMany returns count = 0 and we abort.
+        for (const item of orderItemsData) {
+          const result = await tx.productVariant.updateMany({
+            where: {
+              id: item.variantId,
+              isActive: true,
+              stock: { gte: item.quantity },
+            },
+            data: { stock: { decrement: item.quantity } },
+          })
+          if (result.count !== 1) {
+            throw new OrderError(
+              `Stock changed for variant ${item.variantId}. Please try again.`,
+              409
+            )
+          }
+        }
+
+        const newOrder = await tx.order.create({
+          data: {
+            orderNumber,
+            customerEmail,
+            customerName,
+            customerPhone,
+            subtotal,
+            shippingCost,
+            tax,
+            discount,
+            total,
+            notes,
+            giftMessage,
+            isGiftWrapped,
+            status: 'PENDING',
+            ...(couponId ? { coupon: { connect: { id: couponId } } } : {}),
+            items: { create: orderItemsData },
+            address: shippingAddress ? {
+              create: {
+                firstName: shippingAddress.firstName || '',
+                lastName: shippingAddress.lastName || '',
+                address1: shippingAddress.address1 || shippingAddress.address || '',
+                city: shippingAddress.city || '',
+                state: shippingAddress.state || '',
+                postalCode: shippingAddress.postalCode || shippingAddress.pincode || '',
+                country: 'India',
+                phone: customerPhone,
+                user: { connect: { id: session.user?.id } },
+              },
+            } : undefined,
+          },
+          include: { items: true, address: true },
+        })
+
+        return newOrder
+      },
+      { isolationLevel: 'Serializable' }
+    )
 
     if (couponId) {
       await prisma.coupon.update({
@@ -227,7 +282,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const orderWithItems = order as any
+    const orderWithItems: OrderWithItemsAndAddress = order
 
     if (orderWithItems.customerEmail) {
       try {
@@ -322,6 +377,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(order, { status: 201 })
   } catch (error) {
+    if (error instanceof OrderError) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
     console.error('Error creating order:', error)
     return NextResponse.json(
       { error: 'Failed to create order' },

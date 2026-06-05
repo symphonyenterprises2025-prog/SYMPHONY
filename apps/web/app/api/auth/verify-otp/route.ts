@@ -19,7 +19,7 @@ const verifySchema = z.object({
 export async function POST(request: Request) {
   try {
     const ip = request.headers.get("x-forwarded-for") || "unknown";
-    const rl = rateLimit(`verify-otp:${ip}`, 5, 60 * 1000);
+    const rl = await rateLimit(`verify-otp:${ip}`, 5, 60 * 1000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many attempts. Please try again later." },

@@ -1,38 +1,70 @@
-type RateLimitEntry = {
-  count: number
+import { prisma } from './db'
+
+export interface RateLimitResult {
+  allowed: boolean
+  remaining: number
   resetAt: number
 }
 
-const store = new Map<string, RateLimitEntry>()
+const CLEANUP_PROBABILITY = 0.01 // 1% chance per call to GC expired rows
 
-// Clean up expired entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, entry] of store.entries()) {
-    if (entry.resetAt <= now) {
-      store.delete(key)
-    }
-  }
-}, 5 * 60 * 1000)
-
-export function rateLimit(
+/**
+ * Postgres-backed sliding-window rate limiter.
+ *
+ * Replaces the previous in-memory Map so the limit survives cold starts,
+ * scales across instances, and doesn't leak a setInterval per serverless
+ * function. Expired rows are reaped opportunistically on a small fraction
+ * of calls.
+ */
+export async function rateLimit(
   key: string,
   maxAttempts: number = 5,
-  windowMs: number = 60 * 1000 // 1 minute
-): { allowed: boolean; remaining: number; resetAt: number } {
+  windowMs: number = 60 * 1000
+): Promise<RateLimitResult> {
   const now = Date.now()
-  const entry = store.get(key)
+  const newResetAt = new Date(now + windowMs)
 
-  if (!entry || entry.resetAt <= now) {
-    store.set(key, { count: 1, resetAt: now + windowMs })
-    return { allowed: true, remaining: maxAttempts - 1, resetAt: now + windowMs }
+  if (Math.random() < CLEANUP_PROBABILITY) {
+    // Fire and forget; never block the caller on cleanup.
+    prisma.rateLimitEntry
+      .deleteMany({ where: { resetAt: { lt: new Date() } } })
+      .catch((err) => console.error('rate-limit cleanup failed:', err))
   }
 
-  entry.count++
+  const result = await prisma.$transaction(async (tx) => {
+    const existing = await tx.rateLimitEntry.findUnique({ where: { key } })
 
-  if (entry.count > maxAttempts) {
-    return { allowed: false, remaining: 0, resetAt: entry.resetAt }
-  }
+    if (!existing || existing.resetAt.getTime() <= now) {
+      const upserted = await tx.rateLimitEntry.upsert({
+        where: { key },
+        update: { count: 1, resetAt: newResetAt },
+        create: { key, count: 1, resetAt: newResetAt },
+      })
+      return {
+        allowed: true,
+        remaining: Math.max(0, maxAttempts - upserted.count),
+        resetAt: upserted.resetAt.getTime(),
+      }
+    }
 
-  return { allowed: true, remaining: maxAttempts - entry.count, resetAt: entry.resetAt }
+    if (existing.count >= maxAttempts) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: existing.resetAt.getTime(),
+      }
+    }
+
+    const updated = await tx.rateLimitEntry.update({
+      where: { key },
+      data: { count: { increment: 1 } },
+    })
+    return {
+      allowed: true,
+      remaining: Math.max(0, maxAttempts - updated.count),
+      resetAt: updated.resetAt.getTime(),
+    }
+  })
+
+  return result
 }

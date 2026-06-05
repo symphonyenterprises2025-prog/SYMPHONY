@@ -3,30 +3,41 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').toLowerCase().trim()
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''
+
 async function main() {
   console.log('🌱 Starting seed...')
 
+  if (!ADMIN_EMAIL) {
+    throw new Error('ADMIN_EMAIL is not set. Set it in your environment before running the seed.')
+  }
+  if (!ADMIN_PASSWORD) {
+    throw new Error('ADMIN_PASSWORD is not set. Set it in your environment before running the seed.')
+  }
+
   // Hash passwords
-  const adminPassword = await bcrypt.hash('Prakash@2026', 10)
-  const hashedPassword = await bcrypt.hash('password123', 10)
+  const adminPassword = await bcrypt.hash(ADMIN_PASSWORD, 10)
+  const sampleCustomerPassword = process.env.SEED_CUSTOMER_PASSWORD || 'password123'
+  const hashedPassword = await bcrypt.hash(sampleCustomerPassword, 10)
 
   // Create/update admin user
   await prisma.user.deleteMany({ where: { email: 'admin@symphony.com' } })
   const admin = await prisma.user.upsert({
-    where: { email: 'symphonyenterprises2025@gmail.com' },
+    where: { email: ADMIN_EMAIL },
     update: {
       name: 'Admin',
       role: 'ADMIN',
       password: adminPassword,
     },
     create: {
-      email: 'symphonyenterprises2025@gmail.com',
+      email: ADMIN_EMAIL,
       name: 'Admin',
       role: 'ADMIN',
       password: adminPassword,
     },
   })
-  console.log('✅ Admin user created')
+  console.log(`✅ Admin user created/updated: ${admin.email}`)
 
   // Create sample customers with upsert to ensure passwords are set
   const sampleCustomers = [

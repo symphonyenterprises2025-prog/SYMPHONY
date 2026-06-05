@@ -1,6 +1,6 @@
 const https = require('https');
 
-const url = process.env.PING_URL || 'https://symphony-ecommerce.onrender.com/api/ping';
+const url = process.env.PING_URL || 'https://symphonyenterprise.co.in/api/ping';
 
 https.get(url, (res) => {
   console.log(`Pinged ${url} - Status: ${res.statusCode}`);

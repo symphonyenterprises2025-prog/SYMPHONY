@@ -2,23 +2,44 @@ import { NextAuthOptions, getServerSession } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from './db'
 import bcrypt from 'bcryptjs'
+import type { UserRole } from '@prisma/client'
 
-const ADMIN_EMAIL = 'symphonyenterprises2025@gmail.com'
-const ADMIN_PASSWORD = 'Prakash@2026'
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').toLowerCase().trim()
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''
+const ADMIN_NAME = process.env.ADMIN_NAME || 'Admin'
 
 let adminBootstrapped = false
 
+function getAdminEmail(): string {
+  if (ADMIN_EMAIL) return ADMIN_EMAIL
+  throw new Error(
+    'ADMIN_EMAIL is not configured. Set ADMIN_EMAIL in your environment (e.g. .env or Render env vars).'
+  )
+}
+
+function getAdminPassword(): string {
+  if (ADMIN_PASSWORD) return ADMIN_PASSWORD
+  throw new Error(
+    'ADMIN_PASSWORD is not configured. Set ADMIN_PASSWORD in your environment before seeding the admin user.'
+  )
+}
+
 async function ensureAdminExists() {
   if (adminBootstrapped) return
-  const existing = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } })
+  const email = getAdminEmail()
+  const password = getAdminPassword()
+  const existing = await prisma.user.findUnique({ where: { email } })
   if (!existing) {
-    const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10)
+    const hashed = await bcrypt.hash(password, 10)
     await prisma.user.create({
-      data: { email: ADMIN_EMAIL, name: 'Admin', role: 'ADMIN', password: hashed },
+      data: { email, name: ADMIN_NAME, role: 'ADMIN', password: hashed },
     })
-  } else if (!existing.password) {
-    const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10)
-    await prisma.user.update({ where: { email: ADMIN_EMAIL }, data: { password: hashed, role: 'ADMIN' } })
+  } else if (!existing.password || existing.role !== 'ADMIN') {
+    const hashed = await bcrypt.hash(password, 10)
+    await prisma.user.update({
+      where: { email },
+      data: { password: hashed, role: 'ADMIN' },
+    })
   }
   adminBootstrapped = true
 }
@@ -26,6 +47,7 @@ async function ensureAdminExists() {
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60,
   },
   pages: {
     signIn: '/login',
@@ -43,23 +65,18 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Bootstrap admin user on first login attempt
-        if (credentials.email === ADMIN_EMAIL) {
+        const email = credentials.email.toLowerCase().trim()
+
+        // Bootstrap admin user on first login attempt for the configured admin email
+        if (email === getAdminEmail()) {
           await ensureAdminExists()
         }
 
-        // Check database for user authentication
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        }) as any
+          where: { email },
+        })
 
-        if (!user) {
-          return null
-        }
-
-        // Verify password (if user has password set)
-        if (!user.password) {
-          // User exists but no password set - likely OAuth user or needs password reset
+        if (!user || !user.password) {
           return null
         }
 
@@ -76,7 +93,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          role: user.role as UserRole,
           phone: user.phone,
           whatsapp: user.whatsapp,
         }
@@ -89,13 +106,13 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub
       }
       if (token.role && session.user) {
-        session.user.role = token.role as string
+        session.user.role = token.role as UserRole
       }
       if (token.phone && session.user) {
-        session.user.phone = token.phone as string
+        session.user.phone = token.phone
       }
       if (token.whatsapp && session.user) {
-        session.user.whatsapp = token.whatsapp as string
+        session.user.whatsapp = token.whatsapp
       }
       return session
     },
@@ -108,15 +125,12 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async redirect({ url, baseUrl }) {
-      // If URL is already absolute, return it as-is
       if (url.startsWith('http://') || url.startsWith('https://')) {
         return url
       }
-      // If URL is relative, return it
       if (url.startsWith('/')) {
         return url
       }
-      // Otherwise, construct from baseUrl
       return `${baseUrl}${url}`
     },
   },

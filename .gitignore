@@ -17,8 +17,8 @@ out
 *.db
 *.sqlite
 
-# Prisma
-prisma/migrations/**/migration.sql
+# TypeScript build info
+*.tsbuildinfo
 
 # IDE
 .vscode

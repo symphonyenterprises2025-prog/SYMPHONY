@@ -512,6 +512,18 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+// Rate limit buckets (used by lib/rate-limit.ts)
+model RateLimitEntry {
+  key       String   @id
+  count     Int      @default(0)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
+  @@map("rate_limit_entries")
+}
+
 // Corporate inquiry
 model CorporateInquiry {
   id          String   @id @default(cuid())
