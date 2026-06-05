@@ -84,7 +84,7 @@ export default function AboutPage() {
               eyebrow="Inside Symphony Enterprise"
               title="A Bhubaneswar gifting studio built around memorable details."
               description="Since 2020, Symphony Enterprise has focused on customized gifting, laser engraving, trophies, festive boxes, and corporate presentation pieces that look polished before they are opened."
-              image="/images/about/hero.jpg"
+              image="/images/about/hero.webp"
               actions={
                 <>
                   <Link
