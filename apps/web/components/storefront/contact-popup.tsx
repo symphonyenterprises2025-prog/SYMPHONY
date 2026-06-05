@@ -48,12 +48,15 @@ export function ContactPopup() {
 
           {/* Heading */}
           <h3 className="font-sans text-2xl font-semibold text-slate-950 sm:text-3xl">
-            Need Help?
+            IMPORTANT NOTICE
           </h3>
 
           {/* Message */}
           <p className="mt-3 font-sans text-sm text-slate-600 sm:text-base">
-            We&apos;re here to assist you with orders, customization, and gifting inquiries.
+            For quotation, pricing, and product inquiries, please WhatsApp us instead of calling.
+          </p>
+          <p className="mt-2 font-sans text-sm text-slate-600 sm:text-base">
+            Kindly call only after order confirmation or for urgent matters.
           </p>
 
           {/* Phone Number */}
@@ -72,30 +75,20 @@ export function ContactPopup() {
           {/* Action Buttons */}
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <a
-              href="tel:+917978974823"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-[#1f3763] px-6 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#172c53]"
-            >
-              <Phone className="mr-2 h-4 w-4" />
-              Call Now
-            </a>
-            <a
               href="https://wa.me/917978974823"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-[#d0b57a] bg-white px-6 text-sm font-semibold uppercase tracking-wide text-slate-900 transition-colors hover:bg-[#f8f2e5]"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-[#1f3763] px-6 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#172c53]"
             >
               <MessageCircle className="mr-2 h-4 w-4" />
-              WhatsApp
+              Message Us on WhatsApp
             </a>
           </div>
 
-          {/* Dismiss Text */}
-          <button
-            onClick={handleClose}
-            className="mt-4 text-xs text-slate-500 hover:text-slate-700 underline"
-          >
-            Maybe later
-          </button>
+          {/* Thank You Message */}
+          <p className="mt-4 text-xs font-semibold text-slate-700">
+            Thank you for Cooperation!
+          </p>
         </div>
       </div>
     </div>
