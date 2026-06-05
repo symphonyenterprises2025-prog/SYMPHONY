@@ -3,6 +3,26 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from './db'
 import bcrypt from 'bcryptjs'
 
+const ADMIN_EMAIL = 'symphonyenterprises2025@gmail.com'
+const ADMIN_PASSWORD = 'Prakash@2026'
+
+let adminBootstrapped = false
+
+async function ensureAdminExists() {
+  if (adminBootstrapped) return
+  const existing = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } })
+  if (!existing) {
+    const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10)
+    await prisma.user.create({
+      data: { email: ADMIN_EMAIL, name: 'Admin', role: 'ADMIN', password: hashed },
+    })
+  } else if (!existing.password) {
+    const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10)
+    await prisma.user.update({ where: { email: ADMIN_EMAIL }, data: { password: hashed, role: 'ADMIN' } })
+  }
+  adminBootstrapped = true
+}
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
@@ -21,6 +41,11 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null
+        }
+
+        // Bootstrap admin user on first login attempt
+        if (credentials.email === ADMIN_EMAIL) {
+          await ensureAdminExists()
         }
 
         // Check database for user authentication
