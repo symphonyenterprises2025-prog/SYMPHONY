@@ -68,13 +68,26 @@ export const authOptions: NextAuthOptions = {
         const email = credentials.email.toLowerCase().trim()
 
         // Bootstrap admin user on first login attempt for the configured admin email
-        if (email === getAdminEmail()) {
-          await ensureAdminExists()
+        try {
+          if (email === getAdminEmail()) {
+            await ensureAdminExists()
+          }
+        } catch (err) {
+          // Env var missing or DB down. Log the real cause and return
+          // null so the user sees a generic "Invalid credentials" error
+          // (and so a misconfigured deploy doesn't leak which env var
+          // is missing via a 500 stack trace).
+          console.error('[next-auth] admin bootstrap failed:', err)
+          return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email },
-        })
+        let user
+        try {
+          user = await prisma.user.findUnique({ where: { email } })
+        } catch (err) {
+          console.error('[next-auth] user lookup failed:', err)
+          return null
+        }
 
         if (!user || !user.password) {
           return null

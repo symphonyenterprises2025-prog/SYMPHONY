@@ -1,5 +1,8 @@
--- CreateEnum
-CREATE TYPE "ReviewStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+-- Note: ReviewStatus enum already exists in prod DB (left over from a
+-- partial apply). The CREATE TYPE is intentionally omitted to keep this
+-- migration idempotent when re-run. The CREATE TABLE for product_reviews
+-- below still references the type, which is fine because Postgres
+-- accepts references to existing types.
 
 -- CreateTable
 CREATE TABLE "shop_by_categories" (
