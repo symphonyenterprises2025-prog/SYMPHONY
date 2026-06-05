@@ -10,7 +10,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   await requireAdmin()
 
   const { id } = await params
-  
+
   const product = await prisma.product.findUnique({
     where: { id },
     include: {
@@ -19,7 +19,14 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       },
       variants: {
         orderBy: { createdAt: 'asc' }
-      }
+      },
+      _count: {
+        select: {
+          orderItems: true,
+          cartItems: true,
+          reviews: true,
+        },
+      },
     }
   })
 
@@ -29,6 +36,11 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
 
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: 'asc' }
+  })
+
+  // Product has no back-relation for WishlistItem, so count separately.
+  const wishlistCount = await prisma.wishlistItem.count({
+    where: { productId: id },
   })
 
   return (
@@ -42,7 +54,16 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
 
       <Card>
         <CardContent className="pt-6">
-          <EditProductForm product={product} categories={categories} />
+          <EditProductForm
+            product={product}
+            categories={categories}
+            historyCounts={{
+              orderItems: product._count.orderItems,
+              cartItems: product._count.cartItems,
+              wishlistItems: wishlistCount,
+              reviews: product._count.reviews,
+            }}
+          />
         </CardContent>
       </Card>
     </div>

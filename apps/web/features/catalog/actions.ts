@@ -6,6 +6,7 @@ import { revalidateProducts } from '@/lib/revalidate'
 import { requireAdmin } from '@/lib/admin-auth'
 
 export async function toggleProductFeatured(productId: string) {
+  await requireAdmin()
   const product = await prisma.product.findUnique({
     where: { id: productId },
   })
@@ -17,6 +18,25 @@ export async function toggleProductFeatured(productId: string) {
   await prisma.product.update({
     where: { id: productId },
     data: { isFeatured: !product.isFeatured },
+  })
+
+  revalidateProducts()
+}
+
+export async function toggleProductActive(productId: string) {
+  await requireAdmin()
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { id: true, isActive: true },
+  })
+
+  if (!product) {
+    throw new Error('Product not found')
+  }
+
+  await prisma.product.update({
+    where: { id: productId },
+    data: { isActive: !product.isActive },
   })
 
   revalidateProducts()
@@ -66,6 +86,7 @@ export async function createProduct(data: {
 }
 
 export async function updateProduct(id: string, data: any) {
+  await requireAdmin()
   const product = await prisma.product.update({
     where: { id },
     data,
@@ -86,7 +107,7 @@ export async function deleteProduct(id: string) {
   if (orderItemCount > 0) {
     throw new Error(
       `Cannot delete: this product is part of ${orderItemCount} past order${orderItemCount === 1 ? '' : 's'}. ` +
-        'Mark it as inactive instead to preserve order history.'
+        'Mark it as inactive instead, or use Hard Delete from the product page to remove everything.'
     )
   }
 
@@ -114,7 +135,79 @@ export async function deleteProduct(id: string) {
   revalidateProducts()
 }
 
+/**
+ * Hard delete: removes the product AND every related history row
+ * (OrderItem, CartItem, WishlistItem, ProductReview, ProductImage,
+ * ProductVariant). MediaAsset.productId is set to NULL by the schema.
+ *
+ * GUARD: only allowed if the product is already marked isActive=false.
+ * This is a two-step process by design -- admin must first take the
+ * product out of the storefront, then escalate to a destructive
+ * delete. Prevents accidental data loss.
+ *
+ * Also: the action is irreversible. We do not log the deletion
+ * because there is no audit log model in the schema. If compliance
+ * requires one in the future, add a deletion_log table and write
+ * to it inside the same transaction.
+ */
+export async function hardDeleteProduct(id: string) {
+  await requireAdmin()
+
+  const product = await prisma.product.findUnique({
+    where: { id },
+    select: { id: true, isActive: true, name: true },
+  })
+
+  if (!product) {
+    throw new Error('Product not found.')
+  }
+
+  if (product.isActive) {
+    throw new Error(
+      `Hard delete blocked: "${product.name}" is still active. ` +
+        'Mark it inactive first, then return here to hard delete.'
+    )
+  }
+
+  // Count what we are about to destroy, so the error path can
+  // mention them by name. (Not used on the success path because
+  // the UI already shows the breakdown before this action runs.)
+  const [orderItems, cartItems, wishlistItems, reviews] = await Promise.all([
+    prisma.orderItem.count({ where: { productId: id } }),
+    prisma.cartItem.count({ where: { productId: id } }),
+    prisma.wishlistItem.count({ where: { productId: id } }),
+    prisma.productReview.count({ where: { productId: id } }),
+  ])
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // OrderItem first: variants cascade-delete with the product,
+      // but OrderItem.productId is non-cascading, so it must go first
+      // to avoid an FK violation when the product (and its variants)
+      // are dropped.
+      await tx.orderItem.deleteMany({ where: { productId: id } })
+      await tx.cartItem.deleteMany({ where: { productId: id } })
+      await tx.wishlistItem.deleteMany({ where: { productId: id } })
+      // ProductVariant, ProductImage, ProductReview cascade.
+      // MediaAsset is onDelete:SetNull.
+      await tx.product.delete({ where: { id } })
+    })
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
+      throw new Error(
+        `Hard delete failed: a related record is blocking the delete. ` +
+          `(${orderItems} orders, ${cartItems} cart items, ${wishlistItems} wishlist items, ${reviews} reviews were found.) ` +
+          'A schema change may have introduced a new FK. Contact the developer.'
+      )
+    }
+    throw err
+  }
+
+  revalidateProducts()
+}
+
 export async function addProductImage(productId: string, url: string, alt?: string) {
+  await requireAdmin()
   const maxOrder = await prisma.productImage.findFirst({
     where: { productId },
     orderBy: { sortOrder: 'desc' },
@@ -123,7 +216,7 @@ export async function addProductImage(productId: string, url: string, alt?: stri
   const image = await prisma.productImage.create({
     data: {
       productId,
-      url,
+      url: url,
       alt: alt || '',
       sortOrder: (maxOrder?.sortOrder ?? -1) + 1,
     },
@@ -134,6 +227,7 @@ export async function addProductImage(productId: string, url: string, alt?: stri
 }
 
 export async function deleteProductImage(imageId: string) {
+  await requireAdmin()
   await prisma.productImage.delete({
     where: { id: imageId },
   })
@@ -142,6 +236,7 @@ export async function deleteProductImage(imageId: string) {
 }
 
 export async function updateProductImageOrder(imageId: string, sortOrder: number) {
+  await requireAdmin()
   await prisma.productImage.update({
     where: { id: imageId },
     data: { sortOrder },
