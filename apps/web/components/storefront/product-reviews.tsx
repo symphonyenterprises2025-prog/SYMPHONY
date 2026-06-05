@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,11 +26,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   const [formData, setFormData] = useState({ rating: 5, title: "", content: "" });
   const [formError, setFormError] = useState("");
 
-  useEffect(() => {
-    fetchReviews();
-  }, []);
-
-  async function fetchReviews() {
+  const fetchReviews = useCallback(async () => {
     try {
       const res = await fetch(`/api/reviews?productId=${productId}`);
       if (res.ok) {
@@ -44,7 +40,11 @@ export function ProductReviews({ productId }: { productId: string }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [productId]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

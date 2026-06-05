@@ -53,7 +53,7 @@ export function ContactPopup() {
 
           {/* Message */}
           <p className="mt-3 font-sans text-sm text-slate-600 sm:text-base">
-            We're here to assist you with orders, customization, and gifting inquiries.
+            We&apos;re here to assist you with orders, customization, and gifting inquiries.
           </p>
 
           {/* Phone Number */}

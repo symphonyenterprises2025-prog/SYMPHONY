@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header-server";
@@ -134,11 +135,12 @@ export default async function CustomizedTShirtsPage() {
                 {productCards.map((product: typeof productCards[number]) => (
                   <Link key={product.href} href={product.href}>
                     <div className="rounded-[2rem] border border-[#eadfca] bg-white p-4 shadow-[0_24px_60px_rgba(45,36,20,0.1)] hover:shadow-[0_32px_80px_rgba(45,36,20,0.15)] transition-all hover:-translate-y-1">
-                      <div className="aspect-square rounded-xl bg-[#fbf8f1] overflow-hidden mb-4">
-                        <img
+                      <div className="aspect-square rounded-xl bg-[#fbf8f1] overflow-hidden mb-4 relative">
+                        <Image
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       </div>
                       <h3 className="font-sans text-lg font-semibold text-slate-950">
