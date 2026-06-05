@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 
 interface HeroRotatorProps {
   images: {
@@ -36,12 +35,10 @@ export function HeroRotator({ images, interval = 5000, className = '' }: HeroRot
             index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Image
+          <img
             src={image.url}
             alt={image.alt || 'Hero image'}
-            fill
-            className="object-cover"
-            priority={index === 0}
+            className="w-full h-full object-cover"
           />
         </div>
       ))}
