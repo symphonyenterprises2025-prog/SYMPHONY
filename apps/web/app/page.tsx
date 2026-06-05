@@ -11,6 +11,7 @@ import {
   StorefrontContainer,
 } from "@/components/storefront/brand-system";
 import { HeroRotator } from "@/components/storefront/hero-rotator";
+import { ContactPopup } from "@/components/storefront/contact-popup";
 import { getProducts, getShopByCategories } from "@/features/catalog/queries";
 
 // Make this page dynamic to avoid build-time database access
@@ -44,6 +45,7 @@ export default async function HomePage() {
   return (
     <StorefrontCanvas>
       <SiteHeader />
+      <ContactPopup />
 
       <main className="pb-16 pt-8">
         <StorefrontContainer>
