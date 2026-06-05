@@ -7,6 +7,7 @@ import { LockKeyhole, Mail, Shield } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 
 export default function AdminLoginPage() {
@@ -78,11 +79,10 @@ export default function AdminLoginPage() {
               <Label htmlFor="password" className="text-slate-300">Password</Label>
               <div className="relative">
                 <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
-                  className="h-11 rounded-lg border-slate-700 bg-slate-800 pl-10 text-white placeholder:text-slate-500"
+                  className="h-11 rounded-lg border-slate-700 bg-slate-800 pl-10 pr-10 text-white placeholder:text-slate-500"
                   required
                 />
               </div>

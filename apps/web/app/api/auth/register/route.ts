@@ -46,9 +46,24 @@ export async function POST(request: NextRequest) {
     // Pre-flight: verify auth subsystem is healthy. Cached for 60s.
     const health = await checkAuthHealth()
     if (!health.ok) {
-      if (!health.checks.brevoKey.configured) {
+      const b = health.checks.brevo
+      if (!b.apiKeyConfigured) {
         console.error('[register] BREVO_API_KEY missing -- OTP email cannot be sent')
         return emailNotConfiguredResponse()
+      }
+      if (b.apiKeyConfigured && !b.apiKeyValid) {
+        console.error('[register] BREVO_API_KEY is invalid:', b.error)
+        return NextResponse.json(
+          { error: 'Email service is misconfigured (invalid API key). Please contact support.' },
+          { status: 503 }
+        )
+      }
+      if (b.apiKeyValid && b.senderVerified === false) {
+        console.error(
+          `[register] Brevo sender ${b.senderConfigured} is not verified. ` +
+            'Verify it in Brevo dashboard -> Settings -> Senders & Domains.'
+        )
+        // Don't 503 here -- let the send fail with its own clear message.
       }
       if (!health.checks.otpTable.ok) {
         return dbMisconfiguredResponse('otp_codes')

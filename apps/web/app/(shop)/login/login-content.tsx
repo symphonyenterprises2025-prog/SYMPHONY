@@ -9,6 +9,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { StorefrontCanvas, StorefrontContainer } from "@/components/storefront/brand-system";
 
@@ -71,7 +72,7 @@ export function LoginContent() {
                   <Label htmlFor="password">Password</Label>
                   <div className="relative">
                     <LockKeyhole className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <Input id="password" name="password" type="password" className="h-12 rounded-xl border-[#e6dbc4] pl-11" required />
+                    <PasswordInput id="password" name="password" className="h-12 rounded-xl border-[#e6dbc4] pl-11" required />
                   </div>
                 </div>
                 <Button className="h-12 w-full rounded-full bg-[#1f3763] text-sm font-semibold uppercase tracking-wide text-white hover:bg-[#172c53]" disabled={loading}>

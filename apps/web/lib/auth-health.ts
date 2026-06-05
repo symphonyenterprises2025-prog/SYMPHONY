@@ -1,4 +1,5 @@
 import { prisma } from './db'
+import { checkBrevoHealth } from './email/brevo'
 
 /**
  * Startup health check for the auth subsystem. Called lazily from the
@@ -20,7 +21,14 @@ export interface AuthHealth {
     rateLimitTable: { ok: boolean; error?: string }
     otpTable: { ok: boolean; error?: string }
     userTable: { ok: boolean; error?: string }
-    brevoKey: { ok: boolean; configured: boolean }
+    brevo: {
+      ok: boolean
+      apiKeyConfigured: boolean
+      apiKeyValid?: boolean
+      senderConfigured?: string
+      senderVerified?: boolean
+      error?: string
+    }
     nextAuthSecret: { ok: boolean; configured: boolean }
   }
 }
@@ -39,7 +47,7 @@ export async function checkAuthHealth(): Promise<AuthHealth> {
       rateLimitTable: { ok: true },
       otpTable: { ok: true },
       userTable: { ok: true },
-      brevoKey: { ok: true, configured: !!process.env.BREVO_API_KEY },
+      brevo: { ok: true, apiKeyConfigured: !!process.env.BREVO_API_KEY },
       nextAuthSecret: { ok: true, configured: !!process.env.NEXTAUTH_SECRET },
     },
   }
@@ -88,12 +96,13 @@ export async function checkAuthHealth(): Promise<AuthHealth> {
     result.checks.userTable.ok = false
   }
 
-  // 3. Brevo API key (warning, not fatal -- caller can return 503 specifically)
-  if (!process.env.BREVO_API_KEY) {
-    result.checks.brevoKey.ok = false
-    // Not fatal: signup can still complete if email send is best-effort,
-    // but the registration step that sends OTP will fail. Mark overall
-    // as not-ok so callers can return a clear 503.
+  // 3. Brevo (active call; cached 5 min inside checkBrevoHealth)
+  const brevo = await checkBrevoHealth()
+  result.checks.brevo = brevo
+  if (!brevo.ok || !brevo.senderVerified) {
+    // Not fatal: signup can technically still run if the API key is
+    // valid, but the send will 401/403 and the user will see a 503.
+    // Mark overall not-ok so the cold-start log makes it obvious.
     result.ok = false
   }
 
@@ -120,8 +129,9 @@ export async function bootAuthHealthCheck(): Promise<void> {
   if (!h.ok) {
     console.error('[auth-health] FAIL:', JSON.stringify(h.checks, null, 2))
   } else {
+    const b = h.checks.brevo
     console.log(
-      `[auth-health] OK (db ${h.checks.database.latencyMs}ms, brevo=${h.checks.brevoKey.configured ? 'set' : 'unset'}, nextauth-secret=${h.checks.nextAuthSecret.configured ? 'set' : 'unset'})`
+      `[auth-health] OK (db ${h.checks.database.latencyMs}ms, brevo key=${b.apiKeyValid ? 'valid' : b.apiKeyConfigured ? 'INVALID' : 'unset'}, sender=${b.senderConfigured || 'unset'}${b.senderVerified === false ? ' (NOT VERIFIED)' : ''}, nextauth-secret=${h.checks.nextAuthSecret.configured ? 'set' : 'unset'})`
     )
   }
   if (process.env.NODE_ENV === 'production') {

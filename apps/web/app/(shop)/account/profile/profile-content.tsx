@@ -9,6 +9,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { StorefrontCanvas, StorefrontContainer } from "@/components/storefront/brand-system";
 
@@ -157,9 +158,18 @@ export function ProfileContent() {
                 </div>
               )}
               <form onSubmit={handlePasswordChange} className="mt-6 space-y-5">
-                <div className="space-y-2"><Label htmlFor="currentPassword">Current Password</Label><Input id="currentPassword" name="currentPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" required /></div>
-                <div className="space-y-2"><Label htmlFor="newPassword">New Password</Label><Input id="newPassword" name="newPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" required /></div>
-                <div className="space-y-2"><Label htmlFor="confirmPassword">Confirm New Password</Label><Input id="confirmPassword" name="confirmPassword" type="password" className="h-12 rounded-xl border-[#e6dbc4]" required /></div>
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <PasswordInput id="currentPassword" name="currentPassword" className="h-12 rounded-xl border-[#e6dbc4]" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <PasswordInput id="newPassword" name="newPassword" className="h-12 rounded-xl border-[#e6dbc4]" required minLength={8} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <PasswordInput id="confirmPassword" name="confirmPassword" className="h-12 rounded-xl border-[#e6dbc4]" required minLength={8} />
+                </div>
                 <Button type="submit" variant="outline" className="h-12 rounded-full border-[#d0b57a] bg-white px-8 text-sm font-semibold uppercase tracking-wide text-slate-900 hover:bg-[#f8f2e5]" disabled={passwordLoading}>
                   {passwordLoading ? "Updating..." : "Update Password"}
                 </Button>

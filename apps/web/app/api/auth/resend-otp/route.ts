@@ -38,7 +38,14 @@ export async function POST(request: Request) {
   try {
     const health = await checkAuthHealth()
     if (!health.ok) {
-      if (!health.checks.brevoKey.configured) return emailNotConfiguredResponse()
+      const b = health.checks.brevo
+      if (!b.apiKeyConfigured) return emailNotConfiguredResponse()
+      if (b.apiKeyConfigured && !b.apiKeyValid) {
+        return NextResponse.json(
+          { error: 'Email service is misconfigured (invalid API key). Please contact support.' },
+          { status: 503 }
+        )
+      }
       if (!health.checks.otpTable.ok) return dbMisconfiguredResponse('otp_codes')
       if (!health.checks.userTable.ok) return dbMisconfiguredResponse('users')
       if (!health.checks.database.ok) {
