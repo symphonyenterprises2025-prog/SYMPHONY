@@ -10,13 +10,20 @@ const ALLOWED_REMOTE_IMAGE_HOSTS = [
 
 const nextConfig: NextConfig = {
   images: {
+    // Source images are pre-baked to WebP at 1920px max (see
+    // public/images/home/banner*.webp, about/hero.webp, etc.). The
+    // next/image optimizer is disabled because on the Render free
+    // tier (512 MB) it OOM-kills the instance when several
+    // images are requested in parallel (hero rotator prefetches
+    // all 10, then RSC prefetches kick in). Disabling the
+    // optimizer means next/image renders a plain <img> with the
+    // source file as-is -- fine for already-optimized sources.
+    unoptimized: true,
     remotePatterns: ALLOWED_REMOTE_IMAGE_HOSTS.map((hostname) => ({
       protocol: 'https',
       hostname,
     })),
     formats: ['image/webp'],
-    // Cap the optimizer so a 2x-DPR request never asks for a 3840-px
-    // resize of a 3.6 MB banner. Free tier has ~256 MB to play with.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60,
