@@ -35,6 +35,7 @@ export function HeroRotator({ images, interval = 5000, className = '' }: HeroRot
             index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image.url}
             alt={image.alt || 'Hero image'}
