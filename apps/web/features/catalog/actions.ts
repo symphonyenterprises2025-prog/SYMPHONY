@@ -1,7 +1,9 @@
 'use server'
 
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { revalidateProducts } from '@/lib/revalidate'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function toggleProductFeatured(productId: string) {
   const product = await prisma.product.findUnique({
@@ -74,9 +76,40 @@ export async function updateProduct(id: string, data: any) {
 }
 
 export async function deleteProduct(id: string) {
-  await prisma.product.delete({
-    where: { id },
-  })
+  await requireAdmin()
+
+  // OrderItem rows are order history and must NOT be cascade-deleted.
+  // If any exist, refuse the delete and tell the admin to mark the
+  // product inactive instead. Otherwise the customer can no longer
+  // see what they bought.
+  const orderItemCount = await prisma.orderItem.count({ where: { productId: id } })
+  if (orderItemCount > 0) {
+    throw new Error(
+      `Cannot delete: this product is part of ${orderItemCount} past order${orderItemCount === 1 ? '' : 's'}. ` +
+        'Mark it as inactive instead to preserve order history.'
+    )
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // CartItem and WishlistItem have no onDelete:Cascade on
+      // productId, so a raw delete would FK-violate. Clean them up
+      // explicitly. OrderItem was checked above; ProductVariant,
+      // ProductImage, ProductReview cascade automatically;
+      // MediaAsset is onDelete:SetNull.
+      await tx.cartItem.deleteMany({ where: { productId: id } })
+      await tx.wishlistItem.deleteMany({ where: { productId: id } })
+      await tx.product.delete({ where: { id } })
+    })
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
+      throw new Error(
+        'Cannot delete this product: it has related records (cart items, orders, or reviews) that block deletion. ' +
+          'Mark it as inactive instead.'
+      )
+    }
+    throw err
+  }
 
   revalidateProducts()
 }
