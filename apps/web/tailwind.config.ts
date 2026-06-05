@@ -7,6 +7,29 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './features/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    // Tailwind's JIT scanner misses some arbitrary-value and
+    // variant classes that are unique to app/page.tsx (the hero
+    // block). Listing them explicitly here guarantees they ship
+    // in the production CSS.
+    'sm:h-[460px]',
+    'sm:min-h-[460px]',
+    'sm:px-10',
+    'sm:flex-row',
+    'sm:text-xl',
+    'sm:text-[4rem]',
+    'left-1/2',
+    '-translate-x-1/2',
+    'text-[2.5rem]',
+    'leading-[1.02]',
+    'text-[#f5cf83]',
+    'bg-[#1f3763]',
+    'border-[#d0b57a]',
+    'border-[#eadfca]',
+    'shadow-[0_28px_70px_rgba(46,37,20,0.12)]',
+    'hover:bg-[#172c53]',
+    'hover:bg-[#f8f2e5]',
+  ],
   theme: {
     extend: {
       colors: {
