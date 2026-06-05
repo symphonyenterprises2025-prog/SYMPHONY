@@ -5,28 +5,20 @@ import { X, Phone, MessageCircle } from "lucide-react";
 
 export function ContactPopup() {
   const [isVisible, setIsVisible] = useState(false);
-  const [isClosed, setIsClosed] = useState(false);
 
   useEffect(() => {
-    // Check if user has already closed the popup
-    const hasClosed = localStorage.getItem("contactPopupClosed");
-    if (!hasClosed) {
-      // Show popup after a short delay
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
+    // Show popup after a short delay
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
     setIsVisible(false);
-    setIsClosed(true);
-    // Store in localStorage so it doesn't show again
-    localStorage.setItem("contactPopupClosed", "true");
   };
 
-  if (!isVisible || isClosed) return null;
+  if (!isVisible) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -73,7 +65,7 @@ export function ContactPopup() {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 flex justify-center">
             <a
               href="https://wa.me/917978974823"
               target="_blank"
