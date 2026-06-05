@@ -9,6 +9,8 @@ const ALLOWED_REMOTE_IMAGE_HOSTS = [
 ]
 
 const nextConfig: NextConfig = {
+  // Don't advertise the framework in the response header.
+  poweredByHeader: false,
   images: {
     // Source images are pre-baked to WebP at 1920px max (see
     // public/images/home/banner*.webp, about/hero.webp, etc.). The
@@ -26,7 +28,7 @@ const nextConfig: NextConfig = {
     formats: ['image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 86400,
   },
   compress: true,
   productionBrowserSourceMaps: false,

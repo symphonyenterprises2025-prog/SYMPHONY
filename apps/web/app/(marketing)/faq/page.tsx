@@ -1,10 +1,13 @@
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+// FAQ content is hardcoded in this file -> build once, serve static HTML.
+export const dynamic = 'force-static'
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";

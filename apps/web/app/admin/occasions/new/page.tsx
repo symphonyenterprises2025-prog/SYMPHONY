@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { requireAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 
 export const dynamic = "force-dynamic";
 

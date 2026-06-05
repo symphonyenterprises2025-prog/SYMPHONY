@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { Minus, Plus, RefreshCw, Shield, Star, Truck, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";

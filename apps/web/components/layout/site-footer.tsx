@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { useState } from "react";
 import { Instagram, Mail, MapPin, MessageCircle, Phone, Send, Facebook, Twitter, Loader2, CheckCircle } from "lucide-react";
 import { BrandWordmark, StorefrontContainer } from "@/components/storefront/brand-system";

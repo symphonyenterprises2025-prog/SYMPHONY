@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Package } from 'lucide-react'
-import Link from 'next/link'
+import Link from '@/components/ui/safe-link'
 import { requireAdmin } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'

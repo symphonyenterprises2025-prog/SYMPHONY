@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/ui/safe-link'
 import Image from 'next/image'
 import { ReactNode } from 'react'
 import { Providers } from './providers'

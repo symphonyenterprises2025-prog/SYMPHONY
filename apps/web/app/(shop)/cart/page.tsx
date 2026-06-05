@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";

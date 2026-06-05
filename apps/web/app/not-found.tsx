@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/ui/safe-link';
 import { Button } from '@/components/ui/button';
 import { StorefrontCanvas, StorefrontContainer } from '@/components/storefront/brand-system';
 import { SiteHeader } from '@/components/layout/site-header';

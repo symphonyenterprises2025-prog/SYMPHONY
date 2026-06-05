@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { prisma } from "@/lib/db";
 import { Package, FileText, Users, ShoppingCart, TrendingUp, DollarSign } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";

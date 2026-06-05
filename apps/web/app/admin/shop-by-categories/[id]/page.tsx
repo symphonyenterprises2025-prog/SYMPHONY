@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { requireAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 
 const VALID_TYPES = ['festival', 'occasion', 'offer', 'best-selling', 'featured', 'new-arrival'] as const;
 

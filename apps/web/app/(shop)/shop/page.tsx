@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LockKeyhole, Mail, Shield } from "lucide-react";

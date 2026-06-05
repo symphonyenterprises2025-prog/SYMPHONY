@@ -1,5 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
+
+// No DB / no cookies / no searchParams -> build once, serve static HTML.
+// Saves one server render per visit, which matters on the free tier.
+export const dynamic = 'force-static'
 import {
   Award,
   Clock3,

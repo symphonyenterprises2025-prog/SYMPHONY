@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Package, User, MapPin } from 'lucide-react'
-import Link from 'next/link'
+import Link from '@/components/ui/safe-link'
 import { requireAdmin } from '@/lib/admin-auth'
 import { OrderActions } from './order-actions'
 

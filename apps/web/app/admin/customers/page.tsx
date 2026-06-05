@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/admin-auth";
 

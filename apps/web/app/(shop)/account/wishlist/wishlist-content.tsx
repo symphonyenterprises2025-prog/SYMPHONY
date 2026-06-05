@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Heart, ShoppingBag, Trash2, Loader2 } from "lucide-react";

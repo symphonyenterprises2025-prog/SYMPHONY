@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/ui/safe-link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, Share2, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
