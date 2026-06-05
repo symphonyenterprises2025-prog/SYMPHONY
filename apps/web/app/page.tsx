@@ -54,13 +54,20 @@ export default async function HomePage() {
               <div className="relative h-[380px] sm:h-[460px]">
                 <HeroRotator
                   images={[
-                    { url: "/images/home/banner1.jpg", alt: "Symphony Gifts Banner 1" },
-                    { url: "/images/home/banner2.jpg", alt: "Symphony Gifts Banner 2" },
-                    { url: "/images/home/banner3.jpg", alt: "Symphony Gifts Banner 3" },
+                    { url: "/images/home/banner1.webp", alt: "Symphony Gifts Banner 1" },
+                    { url: "/images/home/banner2.webp", alt: "Symphony Gifts Banner 2" },
+                    { url: "/images/home/banner3.webp", alt: "Symphony Gifts Banner 3" },
+                    { url: "/images/home/banner4.webp", alt: "Symphony Gifts Banner 4" },
+                    { url: "/images/home/banner5.webp", alt: "Symphony Gifts Banner 5" },
+                    { url: "/images/home/banner6.webp", alt: "Symphony Gifts Banner 6" },
+                    { url: "/images/home/banner7.webp", alt: "Symphony Gifts Banner 7" },
+                    { url: "/images/home/banner8.webp", alt: "Symphony Gifts Banner 8" },
+                    { url: "/images/home/banner9.webp", alt: "Symphony Gifts Banner 9" },
+                    { url: "/images/home/banner10.webp", alt: "Symphony Gifts Banner 10" },
                   ]}
                   interval={5000}
                 />
-                <div className="via-[#11345c]/30 absolute inset-0 bg-gradient-to-r from-[#081d34]/40 to-[#1f3763]/10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
                 <div className="relative z-10 flex min-h-[380px] items-center px-6 py-10 sm:min-h-[460px] sm:px-10">
                   <div className="max-w-3xl">
                     <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 font-sans text-sm font-semibold text-white backdrop-blur">
