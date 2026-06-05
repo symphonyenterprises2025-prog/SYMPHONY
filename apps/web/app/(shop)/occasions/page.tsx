@@ -58,7 +58,7 @@ export default async function OccasionsPage() {
 
           <div className="mt-6">
             <section className="relative overflow-hidden rounded-[2rem] border border-[#eadfca] bg-white shadow-[0_28px_70px_rgba(46,37,20,0.12)]">
-              <div className="relative min-h-[380px] sm:min-h-[460px]">
+              <div className="relative h-[380px] sm:h-[460px]">
                 <HeroRotator
                   images={[
                     { url: "/images/occasions/birthday.jpg", alt: "Occasions Banner 1" },
@@ -67,7 +67,7 @@ export default async function OccasionsPage() {
                   interval={5000}
                 />
                 <div className="via-[#11345c]/30 absolute inset-0 bg-gradient-to-r from-[#081d34]/40 to-[#1f3763]/10" />
-                <div className="relative z-10 flex min-h-[380px] items-center px-6 py-10 sm:min-h-[460px] sm:px-10">
+                <div className="relative z-10 flex h-[380px] items-center px-6 py-10 sm:h-[460px] sm:px-10">
                   <div className="max-w-3xl">
                     <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 font-sans text-sm font-semibold text-white backdrop-blur">
                       <svg className="h-4 w-4 text-[#f5cf83]" fill="currentColor" viewBox="0 0 20 20">

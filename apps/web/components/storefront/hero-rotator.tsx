@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 interface HeroRotatorProps {
   images: {
@@ -35,11 +36,13 @@ export function HeroRotator({ images, interval = 5000, className = '' }: HeroRot
             index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={image.url}
             alt={image.alt || 'Hero image'}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            priority={index === 0}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
           />
         </div>
       ))}
