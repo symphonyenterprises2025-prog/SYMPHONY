@@ -165,7 +165,7 @@ async function main() {
       shortDesc: "Complete new employee greeting kit.",
       categorySlug: "welcome-kits",
       price: 1199,
-      images: ["/images/fnp/products/gift11.webp"]
+      images: ["/images/fnp/products/gift01.webp"]
     }
   ]
 

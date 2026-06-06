@@ -476,7 +476,7 @@ async function main() {
         images: {
           create: [
             {
-              url: '/images/fnp/products/gift11.webp',
+              url: '/images/fnp/products/gift01.webp',
               alt: 'Corporate Gift Bundle',
               sortOrder: 1,
             },
