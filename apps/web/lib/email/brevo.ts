@@ -43,7 +43,7 @@ export async function sendEmail(params: EmailParams): Promise<{ messageId: strin
   }
 
   const sender = params.sender || {
-    email: process.env.BREVO_SENDER_EMAIL || 'symphonyenterprise2025@gmail.com',
+    email: process.env.BREVO_SENDER_EMAIL || 'info@symphonyenterprise.co.in',
     name: process.env.BREVO_SENDER_NAME || 'Symphony Enterprise',
   }
 
@@ -91,7 +91,7 @@ export async function sendTransactionalEmail(
   })
 }
 
-const ADMIN_EMAIL = 'symphonyenterprise2025@gmail.com'
+const ADMIN_EMAIL = 'info@symphonyenterprise.co.in'
 
 export async function sendAdminNotification(
   subject: string,
@@ -140,7 +140,7 @@ export async function checkBrevoHealth(): Promise<BrevoHealth> {
   }
 
   const senderEmail =
-    process.env.BREVO_SENDER_EMAIL || 'symphonyenterprise2025@gmail.com'
+    process.env.BREVO_SENDER_EMAIL || 'info@symphonyenterprise.co.in'
 
   try {
     const accountResp = await axios.get(BREVO_ACCOUNT_URL, {

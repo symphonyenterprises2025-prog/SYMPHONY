@@ -159,7 +159,7 @@ export function SiteFooter() {
               </p>
               <p className="flex items-center gap-3 break-all">
                 <Mail className="h-4 w-4 shrink-0 text-[#be9548]" />
-                <span>symphonyenterprise2025@gmail.com</span>
+                <span>info@symphonyenterprise.co.in</span>
               </p>
             </div>
 

@@ -91,7 +91,7 @@ export function getWelcomeEmailTemplate(name: string): string {
       <p style="text-align: center;">
         <a href="${process.env.NEXTAUTH_URL}/shop" class="button">Start Shopping</a>
       </p>
-      <p>If you need any assistance, feel free to reach out to us at <a href="mailto:symphonyenterprise2025@gmail.com" style="color: #1f3763;">symphonyenterprise2025@gmail.com</a> or WhatsApp us at <strong>+91 7978974823</strong>.</p>
+      <p>If you need any assistance, feel free to reach out to us at <a href="mailto:info@symphonyenterprise.co.in" style="color: #1f3763;">info@symphonyenterprise.co.in</a> or WhatsApp us at <strong>+91 7978974823</strong>.</p>
     </div>
     <div class="footer">
       <p>&copy; ${new Date().getFullYear()} Symphony Enterprise. All rights reserved.</p>
@@ -298,7 +298,7 @@ export function getOrderStatusUpdateTemplate(
       ${message ? `<p>${message}</p>` : ''}
       
       <p>You can track your order status by visiting your <a href="${process.env.NEXTAUTH_URL}/account/orders" style="color: #1f3763;">account page</a>.</p>
-      <p>Need help? Contact us at <a href="mailto:symphonyenterprise2025@gmail.com" style="color: #1f3763;">symphonyenterprise2025@gmail.com</a> or WhatsApp <strong>+91 7978974823</strong>.</p>
+      <p>Need help? Contact us at <a href="mailto:info@symphonyenterprise.co.in" style="color: #1f3763;">info@symphonyenterprise.co.in</a> or WhatsApp <strong>+91 7978974823</strong>.</p>
     </div>
     <div class="footer">
       <p>&copy; ${new Date().getFullYear()} Symphony Enterprise. All rights reserved.</p>

@@ -26,7 +26,7 @@ const contactCards = [
   {
     icon: Mail,
     title: "Email Us",
-    description: "symphonyenterprise2025@gmail.com for approvals, artwork sharing, and inquiries.",
+    description: "info@symphonyenterprise.co.in for approvals, artwork sharing, and inquiries.",
   },
   {
     icon: MapPin,
@@ -154,7 +154,7 @@ export default function ContactPage() {
                       <Instagram className="h-5 w-5" />
                     </a>
                     <a
-                      href="mailto:symphonyenterprise2025@gmail.com"
+                      href="mailto:info@symphonyenterprise.co.in"
                       className="flex h-12 w-12 items-center justify-center rounded-full border border-[#eadfca] bg-[#f7f2e8] text-[#1f3763] transition-colors hover:bg-[#eef3fb]"
                     >
                       <Mail className="h-5 w-5" />

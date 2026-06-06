@@ -78,7 +78,7 @@ export default async function AdminSettingsPage() {
                 id="contactEmail"
                 name="contactEmail"
                 type="email"
-                defaultValue={getSetting("CONTACT_EMAIL") || "symphonyenterprise2025@gmail.com"}
+                defaultValue={getSetting("CONTACT_EMAIL") || "info@symphonyenterprise.co.in"}
                 className="h-10"
               />
             </div>
