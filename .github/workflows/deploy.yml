@@ -1,0 +1,27 @@
+name: Deploy to EC2
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /var/www/SYMPHONY
+            git pull origin main
+            pnpm install --no-frozen-lockfile
+            cd prisma
+            npx prisma generate
+            npx prisma migrate deploy
+            cd ../apps/web
+            pnpm build
+            cd ../..
+            pm2 restart symphony
