@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+
+const s3 = new S3Client({
+  region: process.env.S3_REGION || 'ap-south-1',
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+  },
+})
 
 export async function POST(request: NextRequest) {
-  // Check if Supabase is configured
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (!process.env.S3_ACCESS_KEY_ID || !process.env.S3_BUCKET) {
     return NextResponse.json(
-      { error: 'Storage not configured. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.' },
+      { error: 'Storage not configured. Please set S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, and S3_BUCKET environment variables.' },
       { status: 500 }
     )
   }
@@ -32,7 +39,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
@@ -41,7 +47,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
       return NextResponse.json(
@@ -50,35 +55,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate unique filename
     const timestamp = Date.now()
     const randomString = Math.random().toString(36).substring(2, 8)
-    const filename = `${timestamp}-${randomString}-${file.name.replace(/\s+/g, '-')}`
-    
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from('product-images')
-      .upload(filename, file, {
-        contentType: file.type,
-        upsert: false,
-      })
+    const safeName = file.name.replace(/\s+/g, '-')
+    const key = `products/${timestamp}-${randomString}-${safeName}`
+    const buffer = Buffer.from(await file.arrayBuffer())
 
-    if (error) {
-      console.error('Supabase upload error:', error)
-      return NextResponse.json(
-        { error: 'Failed to upload to storage' },
-        { status: 500 }
-      )
-    }
+    await s3.send(new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET!,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type,
+    }))
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(filename)
+    const region = process.env.S3_REGION || 'ap-south-1'
+    const bucket = process.env.S3_BUCKET!
+    const publicUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`
 
     return NextResponse.json({
       url: publicUrl,
-      filename,
+      filename: key,
       size: file.size,
       type: file.type,
     })
