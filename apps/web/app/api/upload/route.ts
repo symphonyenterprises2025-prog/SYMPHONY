@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
       Key: key,
       Body: buffer,
       ContentType: file.type,
+      ACL: 'public-read',
     }))
 
     const region = process.env.S3_REGION || 'ap-south-1'
