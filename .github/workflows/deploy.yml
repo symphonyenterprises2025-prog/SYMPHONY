@@ -20,6 +20,8 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             pnpm install --no-frozen-lockfile
+            # Restore prisma .env (gitignored, overwritten by reset)
+            printf 'DATABASE_URL="postgresql://symphony:symphony-pw-2026@localhost:5432/symphony"\n' > prisma/.env
             cd prisma
             npx prisma generate
             npx prisma migrate deploy
