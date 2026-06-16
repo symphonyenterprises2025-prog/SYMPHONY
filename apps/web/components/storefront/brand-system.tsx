@@ -286,8 +286,8 @@ export function BrandProductCard({
               {label}
             </span>
           ) : null}
-          {hasDiscount && !label ? (
-            <span className="absolute left-3 top-3 z-10 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
+          {hasDiscount ? (
+            <span className="absolute right-3 top-3 z-10 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
               {discountPercent}% OFF
             </span>
           ) : null}
