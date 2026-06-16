@@ -15,6 +15,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
             cd /var/www/SYMPHONY
             git pull origin main
             pnpm install --no-frozen-lockfile
@@ -22,6 +23,13 @@ jobs:
             npx prisma generate
             npx prisma migrate deploy
             cd ../apps/web
+            # Allocate swap to prevent OOM during build on t2.small (2 GB RAM)
+            sudo fallocate -l 2G /swapfile 2>/dev/null || true
+            sudo chmod 600 /swapfile 2>/dev/null || true
+            sudo mkswap /swapfile 2>/dev/null || true
+            sudo swapon /swapfile 2>/dev/null || true
             pnpm build
+            sudo swapoff /swapfile 2>/dev/null || true
+            sudo rm -f /swapfile 2>/dev/null || true
             cd ../..
             pm2 restart symphony
