@@ -10,16 +10,19 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin-auth'
+import { revalidateCategories } from '@/lib/revalidate'
+import { CategoryImageUploadWrapper } from '@/components/admin/category-image-upload'
 
 export const dynamic = 'force-dynamic'
 
-async function updateCategory(formData: FormData) {
+async function updateCategoryAction(formData: FormData) {
   'use server'
-  
+
   const id = formData.get('id') as string
   const name = formData.get('name') as string
   const slug = formData.get('slug') as string
   const description = formData.get('description') as string
+  const image = formData.get('image') as string
   const isActive = formData.get('isActive') === 'on'
   const sortOrder = parseInt(formData.get('sortOrder') as string) || 0
 
@@ -28,12 +31,14 @@ async function updateCategory(formData: FormData) {
     data: {
       name,
       slug,
-      description,
+      description: description || undefined,
+      image: image || undefined,
       isActive,
       sortOrder,
     }
   })
 
+  revalidateCategories()
   redirect('/admin/categories')
 }
 
@@ -70,9 +75,10 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
           <CardTitle>Category Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={updateCategory} className="space-y-4 max-w-2xl">
+          <form action={updateCategoryAction} className="space-y-4 max-w-2xl">
             <input type="hidden" name="id" value={category.id} />
-            
+            <input type="hidden" name="image" id="category-image-input" value={category.image || ''} />
+
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
               <Input id="name" name="name" required defaultValue={category.name} />
@@ -82,6 +88,8 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
               <Label htmlFor="slug">Slug *</Label>
               <Input id="slug" name="slug" required defaultValue={category.slug} />
             </div>
+
+            <CategoryImageUploadWrapper initialImage={category.image} />
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>

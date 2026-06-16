@@ -2,8 +2,9 @@
 
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
-import { revalidateProducts } from '@/lib/revalidate'
+import { revalidateProducts, revalidateCategories } from '@/lib/revalidate'
 import { requireAdmin } from '@/lib/admin-auth'
+import { redirect } from 'next/navigation'
 
 export async function toggleProductFeatured(productId: string) {
   await requireAdmin()
@@ -334,4 +335,32 @@ export async function upsertProductVariant(productId: string, data: {
     revalidateProducts()
     return variant
   }
+}
+
+export async function createCategory(data: {
+  name: string
+  slug: string
+  description?: string
+  image?: string
+  isActive?: boolean
+  sortOrder?: number
+}) {
+  await requireAdmin()
+  await prisma.category.create({ data })
+  revalidateCategories()
+  redirect('/admin/categories')
+}
+
+export async function updateCategory(id: string, data: {
+  name: string
+  slug: string
+  description?: string
+  image?: string
+  isActive?: boolean
+  sortOrder?: number
+}) {
+  await requireAdmin()
+  await prisma.category.update({ where: { id }, data })
+  revalidateCategories()
+  redirect('/admin/categories')
 }

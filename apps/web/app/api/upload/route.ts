@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData()
     const file = formData.get('file') as File
+    const folder = (formData.get('folder') as string) || 'products'
 
     if (!file) {
       return NextResponse.json(
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now()
     const randomString = Math.random().toString(36).substring(2, 8)
     const safeName = file.name.replace(/\s+/g, '-')
-    const key = `products/${timestamp}-${randomString}-${safeName}`
+    const key = `${folder}/${timestamp}-${randomString}-${safeName}`
     const buffer = Buffer.from(await file.arrayBuffer())
 
     await s3.send(new PutObjectCommand({

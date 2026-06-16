@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "@/components/ui/safe-link";
 import { prisma } from "@/lib/db";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ export default async function AdminCategoriesPage() {
           <table className="w-full text-sm text-left">
             <thead className="border-b">
               <tr>
+                <th className="px-4 py-3 font-semibold">Image</th>
                 <th className="px-4 py-3 font-semibold">Name</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 font-semibold">Products Count</th>
@@ -46,13 +48,20 @@ export default async function AdminCategoriesPage() {
             <tbody>
               {categories.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                     No categories found.
                   </td>
                 </tr>
               ) : (
                 categories.map((category: typeof categories[number]) => (
                   <tr key={category.id} className="border-b">
+                    <td className="px-4 py-4">
+                      {category.image ? (
+                        <Image src={category.image} alt={category.name} width={48} height={48} className="rounded-md object-cover h-12 w-12" />
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-4 font-medium">{category.name}</td>
                     <td className="px-4 py-4">
                       <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${category.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
