@@ -32,6 +32,7 @@ model User {
   wishlistItems WishlistItem[]
   auditLogs     AuditLog[]
   reviews       ProductReview[]
+  coupons       UserCoupon[]
 
   @@map("users")
 }
@@ -126,7 +127,7 @@ model Category {
 
   parent      Category?       @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children    Category[]     @relation("CategoryHierarchy")
-  products    Product[]
+  products    Product[]      @relation("ProductCategories")
   shopByCategories ShopByCategory[]
 
   @@map("categories")
@@ -194,15 +195,18 @@ model Product {
   slug        String          @unique
   description String          @db.Text
   shortDesc   String?
-  categoryId  String
   isActive    Boolean         @default(true)
   isFeatured  Boolean         @default(false)
   sortOrder   Int             @default(0)
+  hasCustomization Boolean    @default(false)
+  customizationLabel String?
+  socialProofLine1 String?
+  socialProofLine2 String?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
-  category    Category        @relation(fields: [categoryId], references: [id])
-  collections Collection[]     @relation("ProductCollections")
+  categories  Category[]      @relation("ProductCategories")
+  collections Collection[]    @relation("ProductCollections")
   occasions   Occasion[]      @relation("ProductOccasions")
   variants    ProductVariant[]
   images      ProductImage[]
@@ -210,6 +214,7 @@ model Product {
   orderItems  OrderItem[]
   mediaAssets MediaAsset[]
   reviews     ProductReview[]
+  addOns      AddOn[]         @relation("ProductAddOns")
 
   @@map("products")
 }
@@ -225,7 +230,7 @@ model ProductVariant {
   stock       Int      @default(0)
   lowStock    Int      @default(5)
   weight      Decimal? @db.Decimal(10, 2)
-  attributes  Json     // Store variant attributes like { "color": "red", "size": "M" }
+  attributes  Json
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -265,17 +270,19 @@ model Cart {
 }
 
 model CartItem {
-  id         String         @id @default(cuid())
-  cartId     String
-  productId  String
-  variantId  String
-  quantity   Int            @default(1)
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  id            String         @id @default(cuid())
+  cartId        String
+  productId     String
+  variantId     String
+  quantity      Int            @default(1)
+  customization Json?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
-  cart       Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product    Product        @relation(fields: [productId], references: [id])
-  variant    ProductVariant @relation(fields: [variantId], references: [id])
+  cart          Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product       Product        @relation(fields: [productId], references: [id])
+  variant       ProductVariant @relation(fields: [variantId], references: [id])
+  addOns        CartItemAddOn[]
 
   @@unique([cartId, variantId])
   @@map("cart_items")
@@ -327,21 +334,22 @@ model Order {
 }
 
 model OrderItem {
-  id          String         @id @default(cuid())
-  orderId     String
-  productId   String
-  variantId   String
-  productName String
-  variantName String
-  price       Decimal        @db.Decimal(10, 2)
-  quantity    Int
-  total       Decimal        @db.Decimal(10, 2)
-  // Snapshot of product data at time of order
-  productData Json           // { name, slug, image, etc. }
+  id            String         @id @default(cuid())
+  orderId       String
+  productId     String
+  variantId     String
+  productName   String
+  variantName   String
+  price         Decimal        @db.Decimal(10, 2)
+  quantity      Int
+  total         Decimal        @db.Decimal(10, 2)
+  productData   Json
+  customization Json?
+  addOns        Json?
 
-  order       Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product     Product        @relation(fields: [productId], references: [id])
-  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product       Product        @relation(fields: [productId], references: [id])
+  variant       ProductVariant @relation(fields: [variantId], references: [id])
 
   @@map("order_items")
 }
@@ -405,6 +413,53 @@ model Coupon {
   orders          Order[]
 
   @@map("coupons")
+}
+
+// Add-ons (optional extras like gift wrap, keychain)
+model AddOn {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal         @db.Decimal(10, 2)
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  products    Product[]       @relation("ProductAddOns")
+  cartItems   CartItemAddOn[]
+
+  @@map("add_ons")
+}
+
+model CartItemAddOn {
+  id         String   @id @default(cuid())
+  cartItemId String
+  addOnId    String
+  price      Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+
+  cartItem   CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
+  addOn      AddOn    @relation(fields: [addOnId], references: [id])
+
+  @@map("cart_item_add_ons")
+}
+
+// User-specific coupons
+model UserCoupon {
+  id           String       @id @default(cuid())
+  userId       String
+  code         String       @unique
+  discountType DiscountType
+  discountValue Decimal     @db.Decimal(10, 2)
+  description  String?
+  used         Boolean      @default(false)
+  usedAt       DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime     @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_coupons")
 }
 
 // Content models

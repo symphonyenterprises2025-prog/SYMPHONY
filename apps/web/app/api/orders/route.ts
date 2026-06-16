@@ -156,6 +156,8 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
         total: itemTotal,
         productData: item.productData || {},
+        customization: item.customization || undefined,
+        addOns: item.addOns || undefined,
       })
     }
 
@@ -164,6 +166,8 @@ export async function POST(request: NextRequest) {
     const tax = Math.round(subtotal * 0.09)
     let discount = 0
     let couponId: string | undefined
+
+    let userCouponId: string | undefined
 
     if (couponCode) {
       const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } })
@@ -184,6 +188,21 @@ export async function POST(request: NextRequest) {
           discount = Number(coupon.discountValue)
         }
         couponId = coupon.id
+      } else {
+        // Check user-specific coupon
+        const userCoupon = await prisma.userCoupon.findUnique({ where: { code: couponCode } })
+        if (
+          userCoupon &&
+          !userCoupon.used &&
+          (!userCoupon.expiresAt || userCoupon.expiresAt >= new Date())
+        ) {
+          if (userCoupon.discountType === 'PERCENTAGE') {
+            discount = Math.round(subtotal * Number(userCoupon.discountValue) / 100)
+          } else {
+            discount = Number(userCoupon.discountValue)
+          }
+          userCouponId = userCoupon.id
+        }
       }
     }
 
@@ -279,6 +298,30 @@ export async function POST(request: NextRequest) {
       await prisma.coupon.update({
         where: { id: couponId },
         data: { usageCount: { increment: 1 } },
+      })
+    }
+
+    if (userCouponId) {
+      await prisma.userCoupon.update({
+        where: { id: userCouponId },
+        data: { used: true, usedAt: new Date() },
+      })
+    }
+
+    // Auto-allocate a user coupon after order
+    if (session.user?.id) {
+      const couponCode = `THANKYOU-${orderNumber.slice(-6)}`
+      await prisma.userCoupon.create({
+        data: {
+          userId: session.user.id,
+          code: couponCode,
+          discountType: 'PERCENTAGE',
+          discountValue: 10,
+          description: '10% off your next order - thank you for shopping with us!',
+          expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+        },
+      }).catch((err) => {
+        console.error('Failed to allocate user coupon:', err)
       })
     }
 

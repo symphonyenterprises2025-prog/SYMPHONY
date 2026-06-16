@@ -25,13 +25,19 @@ export function NewProductForm({ categories }: { categories: any[] }) {
     const slug = formData.get('slug') as string
     const shortDesc = formData.get('shortDesc') as string
     const description = formData.get('description') as string
-    const categoryId = formData.get('categoryId') as string
+    const categoryIds = categories
+      .filter((_: any) => formData.get(`cat-${_.id}`) === 'on')
+      .map((_: any) => _.id)
     const price = parseFloat(formData.get('price') as string) || 0
     const comparePrice = parseFloat(formData.get('comparePrice') as string) || undefined
     const stock = parseInt(formData.get('stock') as string) || 0
     const sku = formData.get('sku') as string
     const isActive = formData.get('isActive') === 'on'
     const isFeatured = formData.get('isFeatured') === 'on'
+    const hasCustomization = formData.get('hasCustomization') === 'on'
+    const customizationLabel = formData.get('customizationLabel') as string
+    const socialProofLine1 = formData.get('socialProofLine1') as string
+    const socialProofLine2 = formData.get('socialProofLine2') as string
 
     try {
       const product = await createProduct({
@@ -39,13 +45,17 @@ export function NewProductForm({ categories }: { categories: any[] }) {
         slug,
         description,
         shortDesc,
-        categoryId,
+        categoryIds,
         price,
         comparePrice,
         stock,
         sku,
         isActive,
         isFeatured,
+        hasCustomization,
+        customizationLabel,
+        socialProofLine1,
+        socialProofLine2,
       })
       // Navigate to edit page to add images
       router.push(`/admin/products/${product.id}`)
@@ -72,18 +82,18 @@ export function NewProductForm({ categories }: { categories: any[] }) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="categoryId">Category</Label>
-        <select 
-          id="categoryId" 
-          name="categoryId" 
-          required 
-          className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <option value="">Select a category</option>
+        <Label>Categories</Label>
+        <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+          {categories.length === 0 && (
+            <p className="text-sm text-muted-foreground col-span-2">No categories found. Create one first.</p>
+          )}
           {categories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
+            <label key={cat.id} className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox id={`cat-${cat.id}`} name={`cat-${cat.id}`} />
+              {cat.name}
+            </label>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* Pricing Section */}
@@ -118,6 +128,33 @@ export function NewProductForm({ categories }: { categories: any[] }) {
       <div className="space-y-2">
         <Label htmlFor="description">Full Description</Label>
         <Textarea id="description" name="description" rows={6} required />
+      </div>
+
+      {/* Social Proof Section */}
+      <div className="border rounded-lg p-4 space-y-3 bg-white">
+        <Label className="text-base font-semibold">Social Proof</Label>
+        <p className="text-xs text-muted-foreground">Static text shown on the product page to build trust.</p>
+        <div className="space-y-2">
+          <Label htmlFor="socialProofLine1">Line 1</Label>
+          <Input id="socialProofLine1" name="socialProofLine1" placeholder="e.g. ★ 4.9 rating from 1,024 reviews" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="socialProofLine2">Line 2</Label>
+          <Input id="socialProofLine2" name="socialProofLine2" placeholder="e.g. 10K+ happy customers worldwide" />
+        </div>
+      </div>
+
+      {/* Customization Section */}
+      <div className="border rounded-lg p-4 space-y-3 bg-white">
+        <div className="flex items-center space-x-2">
+          <Checkbox id="hasCustomization" name="hasCustomization" />
+          <Label htmlFor="hasCustomization">Enable Customization</Label>
+        </div>
+        <p className="text-xs text-muted-foreground">Allow customers to provide custom text / upload an image for this product.</p>
+        <div className="space-y-2">
+          <Label htmlFor="customizationLabel">Customization Label</Label>
+          <Input id="customizationLabel" name="customizationLabel" placeholder="e.g. Enter your message for the gift tag" />
+        </div>
       </div>
 
       {/* Info about images */}

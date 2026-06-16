@@ -21,6 +21,8 @@ interface CartItem {
   variant: string;
   productId: string;
   variantId?: string;
+  customization?: any;
+  addOns?: Array<{ id: string; addOnId: string; price: number; addOn: { name: string } }>;
 }
 
 export default function CheckoutPage() {
@@ -60,7 +62,20 @@ export default function CheckoutPage() {
       if (res.ok) {
         const data = await res.json();
         if (data.items && data.items.length > 0) {
-          setCartItems(data.items);
+          setCartItems(
+            data.items.map((item: any) => ({
+              id: item.id,
+              name: item.product?.name || '',
+              price: Number(item.variant?.price || 0),
+              quantity: item.quantity,
+              image: item.product?.images?.[0]?.url || '',
+              variant: item.variant?.name || '',
+              productId: item.productId,
+              variantId: item.variantId,
+              customization: item.customization,
+              addOns: item.addOns,
+            }))
+          );
         } else {
           // Redirect to cart if empty
           router.push("/cart");
@@ -109,6 +124,12 @@ export default function CheckoutPage() {
         variantId: item.variantId,
         productName: item.name,
         variantName: item.variant,
+        customization: item.customization,
+        addOns: item.addOns?.map((a) => ({
+          id: a.addOnId,
+          name: a.addOn?.name || '',
+          price: Number(a.price),
+        })),
       })),
       shippingAddress: {
         firstName: formData.firstName,

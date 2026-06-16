@@ -47,9 +47,13 @@ export async function createProduct(data: {
   slug: string
   description: string
   shortDesc?: string
-  categoryId: string
+  categoryIds: string[]
   isActive?: boolean
   isFeatured?: boolean
+  hasCustomization?: boolean
+  customizationLabel?: string
+  socialProofLine1?: string
+  socialProofLine2?: string
   price?: number
   comparePrice?: number
   stock?: number
@@ -61,9 +65,15 @@ export async function createProduct(data: {
       slug: data.slug,
       description: data.description,
       shortDesc: data.shortDesc,
-      categoryId: data.categoryId,
       isActive: data.isActive ?? true,
       isFeatured: data.isFeatured ?? false,
+      hasCustomization: data.hasCustomization ?? false,
+      customizationLabel: data.customizationLabel,
+      socialProofLine1: data.socialProofLine1,
+      socialProofLine2: data.socialProofLine2,
+      categories: {
+        connect: data.categoryIds.map(id => ({ id })),
+      },
       variants: {
         create: {
           name: 'Default',
@@ -78,6 +88,7 @@ export async function createProduct(data: {
     },
     include: {
       variants: true,
+      categories: true,
     },
   })
 
@@ -87,9 +98,23 @@ export async function createProduct(data: {
 
 export async function updateProduct(id: string, data: any) {
   await requireAdmin()
+  const { categoryIds, hasCustomization, customizationLabel, socialProofLine1, socialProofLine2, ...rest } = data
+
+  const updateData: any = { ...rest }
+  if (hasCustomization !== undefined) updateData.hasCustomization = hasCustomization
+  if (customizationLabel !== undefined) updateData.customizationLabel = customizationLabel
+  if (socialProofLine1 !== undefined) updateData.socialProofLine1 = socialProofLine1
+  if (socialProofLine2 !== undefined) updateData.socialProofLine2 = socialProofLine2
+
+  if (categoryIds && Array.isArray(categoryIds)) {
+    updateData.categories = {
+      set: categoryIds.map((id: string) => ({ id })),
+    }
+  }
+
   const product = await prisma.product.update({
     where: { id },
-    data,
+    data: updateData,
   })
 
   revalidateProducts()

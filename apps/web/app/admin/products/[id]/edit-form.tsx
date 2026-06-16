@@ -125,9 +125,15 @@ export function EditProductForm({
     const slug = formData.get('slug') as string
     const shortDesc = formData.get('shortDesc') as string
     const description = formData.get('description') as string
-    const categoryId = formData.get('categoryId') as string
+    const categoryIds = categories
+      .filter((_: any) => formData.get(`cat-${_.id}`) === 'on')
+      .map((_: any) => _.id)
     const isActive = formData.get('isActive') === 'on'
     const isFeatured = formData.get('isFeatured') === 'on'
+    const hasCustomization = formData.get('hasCustomization') === 'on'
+    const customizationLabel = formData.get('customizationLabel') as string
+    const socialProofLine1 = formData.get('socialProofLine1') as string
+    const socialProofLine2 = formData.get('socialProofLine2') as string
 
     const price = parseFloat(formData.get('price') as string) || 0
     const comparePrice = parseFloat(formData.get('comparePrice') as string) || null
@@ -140,9 +146,13 @@ export function EditProductForm({
         slug,
         description,
         shortDesc,
-        categoryId,
+        categoryIds,
         isActive,
         isFeatured,
+        hasCustomization,
+        customizationLabel,
+        socialProofLine1,
+        socialProofLine2,
       })
 
       await upsertProductVariant(product.id, {
@@ -403,21 +413,21 @@ export function EditProductForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="categoryId">Category</Label>
-          <select
-            id="categoryId"
-            name="categoryId"
-            defaultValue={product.categoryId}
-            required
-            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+          <Label>Categories</Label>
+          <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+            {categories.length === 0 && (
+              <p className="text-sm text-muted-foreground col-span-2">No categories found. Create one first.</p>
+            )}
+            {categories.map((cat) => {
+              const checked = product.categories?.some((pc: any) => pc.id === cat.id)
+              return (
+                <label key={cat.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox id={`cat-${cat.id}`} name={`cat-${cat.id}`} defaultChecked={checked} />
+                  {cat.name}
+                </label>
+              )
+            })}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -478,6 +488,33 @@ export function EditProductForm({
             rows={6}
             required
           />
+        </div>
+
+        {/* Social Proof Section */}
+        <div className="border rounded-lg p-4 space-y-3 bg-white">
+          <Label className="text-base font-semibold">Social Proof</Label>
+          <p className="text-xs text-muted-foreground">Static text shown on the product page to build trust.</p>
+          <div className="space-y-2">
+            <Label htmlFor="socialProofLine1">Line 1</Label>
+            <Input id="socialProofLine1" name="socialProofLine1" defaultValue={product.socialProofLine1 || ''} placeholder="e.g. ★ 4.9 rating from 1,024 reviews" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="socialProofLine2">Line 2</Label>
+            <Input id="socialProofLine2" name="socialProofLine2" defaultValue={product.socialProofLine2 || ''} placeholder="e.g. 10K+ happy customers worldwide" />
+          </div>
+        </div>
+
+        {/* Customization Section */}
+        <div className="border rounded-lg p-4 space-y-3 bg-white">
+          <div className="flex items-center space-x-2">
+            <Checkbox id="hasCustomization" name="hasCustomization" defaultChecked={product.hasCustomization} />
+            <Label htmlFor="hasCustomization">Enable Customization</Label>
+          </div>
+          <p className="text-xs text-muted-foreground">Allow customers to provide custom text / upload an image for this product.</p>
+          <div className="space-y-2">
+            <Label htmlFor="customizationLabel">Customization Label</Label>
+            <Input id="customizationLabel" name="customizationLabel" defaultValue={product.customizationLabel || ''} placeholder="e.g. Enter your message for the gift tag" />
+          </div>
         </div>
 
         <div className="space-y-4 pt-4 border-t">

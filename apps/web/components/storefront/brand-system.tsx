@@ -248,6 +248,7 @@ export function BrandVisualCard({
 export function BrandProductCard({
   name,
   price,
+  comparePrice,
   image,
   images,
   href,
@@ -255,6 +256,7 @@ export function BrandProductCard({
 }: {
   name: string;
   price: number;
+  comparePrice?: number | null;
   image?: string;
   images?: string[];
   href: string;
@@ -262,6 +264,8 @@ export function BrandProductCard({
 }) {
   const allImages = images && images.length > 0 ? images : (image ? [image] : ["/images/fnp/products/gift01.webp"]);
   const hasMultipleImages = allImages.length > 1;
+  const hasDiscount = comparePrice && Number(comparePrice) > Number(price);
+  const discountPercent = hasDiscount ? Math.round((1 - Number(price) / Number(comparePrice)) * 100) : 0;
 
   return (
     <div className="rounded-[1.6rem] border border-[#eadfca] bg-white p-2 shadow-[0_18px_40px_rgba(46,38,22,0.08)]">
@@ -282,6 +286,11 @@ export function BrandProductCard({
               {label}
             </span>
           ) : null}
+          {hasDiscount && !label ? (
+            <span className="absolute left-3 top-3 z-10 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
+              {discountPercent}% OFF
+            </span>
+          ) : null}
         </div>
       </Link>
       <div className="space-y-2 px-1 pb-1 pt-4">
@@ -293,7 +302,12 @@ export function BrandProductCard({
             <Star key={index} className="h-3.5 w-3.5 fill-current" />
           ))}
         </div>
-        <p className="font-sans text-[1.25rem] font-bold text-slate-900">₹{price}</p>
+        <div className="flex items-center gap-2">
+          <p className="font-sans text-[1.25rem] font-bold text-slate-900">₹{price}</p>
+          {hasDiscount && (
+            <p className="font-sans text-sm text-slate-400 line-through">₹{Number(comparePrice)}</p>
+          )}
+        </div>
         <div className="flex gap-2 pt-1">
           <Button
             asChild

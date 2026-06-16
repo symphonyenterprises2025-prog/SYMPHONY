@@ -3,7 +3,7 @@
 import Link from "@/components/ui/safe-link";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Heart, LogOut, MapPin, Package, Settings, User } from "lucide-react";
+import { Heart, LogOut, MapPin, Package, Settings, User, Ticket } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -30,6 +30,7 @@ interface Order {
 const menuItemsBase: MenuItem[] = [
   { title: "My Orders", description: "View your order history and track shipments", icon: Package, href: "/account/orders", count: null },
   { title: "Wishlist", description: "View items you've saved for later", icon: Heart, href: "/account/wishlist", count: null },
+  { title: "My Coupons", description: "View your discount coupons and promo codes", icon: Ticket, href: "/account/coupons", count: null },
   { title: "Addresses", description: "Manage your shipping addresses", icon: MapPin, href: "/account/addresses", count: null },
   { title: "Profile", description: "Update your personal information", icon: User, href: "/account/profile", count: null },
   { title: "Settings", description: "Account preferences and notifications", icon: Settings, href: "/account/settings", count: null },
@@ -75,13 +76,22 @@ export function AccountContent() {
             addressesCount = addressesData.addresses?.length || 0;
           }
 
+          // Fetch coupons count
+          const couponsRes = await fetch("/api/user-coupons");
+          let couponsCount = 0;
+          if (couponsRes.ok) {
+            const couponsData = await couponsRes.json();
+            couponsCount = couponsData.coupons?.length || 0;
+          }
+
           // Update menu items with counts
           setMenuItems([
             { ...menuItemsBase[0], count: ordersCount },
             { ...menuItemsBase[1], count: wishlistCount },
-            { ...menuItemsBase[2], count: addressesCount },
-            { ...menuItemsBase[3], count: null },
+            { ...menuItemsBase[2], count: couponsCount },
+            { ...menuItemsBase[3], count: addressesCount },
             { ...menuItemsBase[4], count: null },
+            { ...menuItemsBase[5], count: null },
           ]);
 
           // Set recent orders (last 3)

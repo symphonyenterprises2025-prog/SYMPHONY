@@ -22,13 +22,13 @@ export async function getProducts({
       return prisma.product.findMany({
         where: {
           isActive: true,
-          categoryId: categoryId || undefined,
+          categories: categoryId ? { some: { id: categoryId } } : undefined,
           collections: collectionId ? { some: { id: collectionId } } : undefined,
           occasions: occasionId ? { some: { id: occasionId } } : undefined,
           isFeatured: featured || undefined,
         },
         include: {
-          category: true,
+          categories: true,
           variants: {
             where: { isActive: true },
             orderBy: { price: 'asc' },
@@ -56,7 +56,7 @@ export async function getProductBySlug(slug: string) {
       return prisma.product.findUnique({
         where: { slug, isActive: true },
         include: {
-          category: true,
+          categories: true,
           variants: {
             where: { isActive: true },
           },
@@ -65,6 +65,9 @@ export async function getProductBySlug(slug: string) {
           },
           collections: true,
           occasions: true,
+          addOns: {
+            where: { isActive: true },
+          },
         },
       })
     },
@@ -174,7 +177,7 @@ export async function getPaginatedProducts({
       }
 
       if (categorySlug) {
-        where.category = { slug: categorySlug }
+        where.categories = { some: { slug: categorySlug } }
       }
       if (collectionSlug) {
         where.collections = { some: { slug: collectionSlug } }
@@ -198,7 +201,7 @@ export async function getPaginatedProducts({
         prisma.product.findMany({
           where,
           include: {
-            category: true,
+            categories: true,
             variants: {
               where: { isActive: true },
               orderBy: { price: 'asc' },

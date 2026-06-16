@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (category) {
-      where.categoryId = category
+      where.categories = { some: { id: category } }
     }
 
     if (search) {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       prisma.product.findMany({
         where,
         include: {
-          category: true,
+          categories: true,
           variants: {
             where: { isActive: true },
           },
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       slug,
       description,
       shortDesc,
-      categoryId,
+      categoryIds = [],
       isActive = true,
       isFeatured = false,
       sortOrder = 0,
@@ -96,10 +96,12 @@ export async function POST(request: NextRequest) {
         slug,
         description,
         shortDesc,
-        categoryId,
         isActive,
         isFeatured,
         sortOrder,
+        categories: {
+          connect: categoryIds.map((id: string) => ({ id })),
+        },
         variants: {
           create: variants.map((v: any) => ({
             name: v.name,
@@ -120,7 +122,7 @@ export async function POST(request: NextRequest) {
         },
       },
       include: {
-        category: true,
+        categories: true,
         variants: true,
         images: true,
       },

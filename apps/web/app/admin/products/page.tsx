@@ -14,7 +14,7 @@ export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
-      category: true,
+      categories: true,
       _count: {
         select: {
           orderItems: true,
@@ -85,7 +85,9 @@ export default async function AdminProductsPage() {
                     <tr key={product.id} className="border-b">
                       <td className="px-4 py-4 font-medium">{product.name}</td>
                       <td className="px-4 py-4 text-muted-foreground">
-                        {product.category?.name || 'Uncategorized'}
+                        {product.categories.length > 0
+                          ? product.categories.map((c) => c.name).join(', ')
+                          : 'Uncategorized'}
                       </td>
                       <td className="px-4 py-4">
                         <span

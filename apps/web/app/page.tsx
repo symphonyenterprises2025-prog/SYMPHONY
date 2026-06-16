@@ -29,6 +29,7 @@ export default async function HomePage() {
   const productCards = products.slice(0, 8).map((product: ProductWithRelations) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
+    comparePrice: Number(product.variants[0]?.comparePrice) || null,
     images: product.images.map(img => img.url),
     href: `/shop/${product.slug}`,
   }));

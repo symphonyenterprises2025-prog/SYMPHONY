@@ -118,6 +118,7 @@ export default async function CorporateGiftingPage() {
   const productCards = corporateProducts.products.map((product: ProductWithRelations) => ({
     name: product.name,
     price: Number(product.variants[0]?.price || 0),
+    comparePrice: Number(product.variants[0]?.comparePrice) || null,
     images: product.images.map(img => img.url),
     href: `/shop/${product.slug}`,
   }));

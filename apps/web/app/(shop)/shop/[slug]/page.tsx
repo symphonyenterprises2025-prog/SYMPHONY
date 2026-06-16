@@ -24,6 +24,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [loading, setLoading] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [addedToWishlist, setAddedToWishlist] = useState(false);
+  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [product, setProduct] = useState<any>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -72,11 +73,13 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           productId: product.id,
           variantId: firstVariant.id,
           quantity,
+          addOnIds: selectedAddOns,
         }),
       });
 
       if (res.ok) {
         setAddedToCart(true);
+        setSelectedAddOns([]);
         setTimeout(() => setAddedToCart(false), 2000);
       }
     } catch (error) {
@@ -144,7 +147,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
             <div className="rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_24px_60px_rgba(45,36,20,0.1)] sm:p-8">
               <p className="font-sans text-sm font-semibold uppercase tracking-[0.22em] text-[#8d6a2f]">
-                {product.category.name}
+                {product.categories?.[0]?.name || 'Product'}
               </p>
               <h1 className="mt-3 font-sans text-[2.3rem] font-semibold leading-tight text-slate-950 sm:text-[3rem]">
                 {product.name}
@@ -158,6 +161,18 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 </div>
                 <span className="text-sm font-medium text-slate-500">4.8 rating</span>
               </div>
+
+              {/* Social Proof */}
+              {(product.socialProofLine1 || product.socialProofLine2) && (
+                <div className="mt-4 space-y-1 rounded-[1rem] border border-[#eadfca] bg-[#fbf8f1] px-4 py-3">
+                  {product.socialProofLine1 && (
+                    <p className="text-sm font-medium text-[#1f3763]">{product.socialProofLine1}</p>
+                  )}
+                  {product.socialProofLine2 && (
+                    <p className="text-sm text-slate-600">{product.socialProofLine2}</p>
+                  )}
+                </div>
+              )}
 
               <div className="mt-5 flex items-end gap-3">
                 <span className="font-sans text-[2rem] font-bold text-slate-950">
@@ -193,6 +208,50 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </div>
                 </div>
               ) : null}
+
+              {/* Add-Ons Selection */}
+              {product.addOns?.length > 0 && (
+                <div className="mt-6">
+                  <p className="font-sans text-sm font-semibold uppercase tracking-wide text-slate-500">
+                    Add-ons
+                  </p>
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {product.addOns.map((addOn: any) => {
+                      const checked = selectedAddOns.includes(addOn.id);
+                      return (
+                        <label
+                          key={addOn.id}
+                          className={`flex cursor-pointer items-center gap-3 rounded-[1rem] border px-4 py-3 text-sm hover:bg-[#f1ebe0] ${
+                            checked
+                              ? 'border-[#c59a46] bg-[#f8f2e5]'
+                              : 'border-[#eadfca] bg-[#fbf8f1]'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              setSelectedAddOns((prev: string[]) =>
+                                prev.includes(addOn.id)
+                                  ? prev.filter((id: string) => id !== addOn.id)
+                                  : [...prev, addOn.id]
+                              );
+                            }}
+                            className="h-4 w-4 accent-[#1f3763]"
+                          />
+                          <div className="flex-1">
+                            <span className="font-medium text-slate-950">{addOn.name}</span>
+                            {addOn.description && (
+                              <p className="text-xs text-slate-500">{addOn.description}</p>
+                            )}
+                          </div>
+                          <span className="font-semibold text-slate-950">+₹{Number(addOn.price)}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div className="inline-flex items-center rounded-full border border-[#eadfca] bg-[#fbf8f1] p-1">
@@ -230,6 +289,36 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <Heart className={`h-5 w-5 ${addedToWishlist ? "fill-red-500 text-red-500" : ""}`} />
                 </Button>
               </div>
+
+              {/* Customization Section */}
+              {product.hasCustomization && (
+                <div className="mt-8 rounded-[1.4rem] border border-[#eadfca] bg-[#fbf8f1] p-5">
+                  <p className="font-sans text-sm font-semibold uppercase tracking-[0.22em] text-[#8d6a2f]">
+                    Customization
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    {product.customizationLabel || 'You can personalize this item.'}
+                  </p>
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Custom Text</label>
+                      <input
+                        type="text"
+                        placeholder="Enter your text here..."
+                        className="mt-1 flex h-10 w-full rounded-lg border border-[#eadfca] bg-white px-3 py-2 text-sm outline-none focus:border-[#c59a46] focus:ring-1 focus:ring-[#c59a46]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Upload Image (optional)</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="mt-1 block w-full text-sm text-slate-500 file:mr-3 file:rounded-full file:border-0 file:bg-[#1f3763] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-[#172c53]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <div className="rounded-[1.4rem] border border-[#eadfca] bg-[#fbf8f1] p-4 text-center">
@@ -282,9 +371,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                         </span>
                       </div>
                       <div className="flex items-center justify-between border-b border-[#efe4d1] pb-3">
-                        <span>Category</span>
+                        <span>Categories</span>
                         <span className="font-semibold text-slate-950">
-                          {product.category.name}
+                          {product.categories?.map((c: any) => c.name).join(', ') || 'N/A'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">

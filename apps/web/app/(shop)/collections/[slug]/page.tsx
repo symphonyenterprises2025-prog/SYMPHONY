@@ -70,6 +70,7 @@ export default async function CollectionDetailPage({ params }: { params: Promise
                   key={product.id}
                   name={product.name}
                   price={firstVariant ? Number(firstVariant.price) : 0}
+                  comparePrice={firstVariant?.comparePrice ? Number(firstVariant.comparePrice) : null}
                   images={product.images.map(img => img.url)}
                   href={`/shop/${product.slug}`}
                 />

@@ -8,6 +8,7 @@ const addToCartSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
   variantId: z.string().min(1, "Variant ID is required"),
   quantity: z.number().int().min(1).default(1),
+  addOnIds: z.array(z.string()).default([]),
 })
 
 export async function GET(request: NextRequest) {
@@ -32,6 +33,9 @@ export async function GET(request: NextRequest) {
               },
             },
             variant: true,
+            addOns: {
+              include: { addOn: true },
+            },
           },
         },
       },
@@ -72,7 +76,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { productId, variantId, quantity } = result.data
+    const { productId, variantId, quantity, addOnIds } = result.data
 
     // Get or create cart
     let cart = await prisma.cart.findUnique({
@@ -100,6 +104,20 @@ export async function POST(request: NextRequest) {
         where: { id: existingItem.id },
         data: { quantity: existingItem.quantity + quantity },
       })
+      // Update add-ons: delete existing, add new
+      await prisma.cartItemAddOn.deleteMany({ where: { cartItemId: existingItem.id } })
+      if (addOnIds.length > 0) {
+        const addOns = await prisma.addOn.findMany({
+          where: { id: { in: addOnIds } },
+        })
+        await prisma.cartItemAddOn.createMany({
+          data: addOns.map((a) => ({
+            cartItemId: existingItem.id,
+            addOnId: a.id,
+            price: a.price,
+          })),
+        })
+      }
     } else {
       await prisma.cartItem.create({
         data: {
@@ -107,6 +125,19 @@ export async function POST(request: NextRequest) {
           productId,
           variantId,
           quantity,
+          addOns: addOnIds.length > 0
+            ? {
+                create: await (async () => {
+                  const addOns = await prisma.addOn.findMany({
+                    where: { id: { in: addOnIds } },
+                  })
+                  return addOns.map((a) => ({
+                    addOnId: a.id,
+                    price: a.price,
+                  }))
+                })(),
+              }
+            : undefined,
         },
       })
     }
@@ -122,6 +153,9 @@ export async function POST(request: NextRequest) {
               },
             },
             variant: true,
+            addOns: {
+              include: { addOn: true },
+            },
           },
         },
       },

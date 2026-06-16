@@ -20,10 +20,38 @@ export async function POST(request: NextRequest) {
     }
 
     const { code, subtotal } = result.data
+    const upperCode = code.toUpperCase()
 
-    const coupon = await prisma.coupon.findUnique({
-      where: { code: code.toUpperCase() },
+    // First check admin-created coupons
+    let coupon = await prisma.coupon.findUnique({
+      where: { code: upperCode },
     })
+
+    // If not found, check user-specific coupons
+    if (!coupon) {
+      const userCoupon = await prisma.userCoupon.findUnique({
+        where: { code: upperCode },
+      })
+      if (userCoupon && !userCoupon.used && (!userCoupon.expiresAt || userCoupon.expiresAt >= new Date())) {
+        let discountAmount = 0
+        if (userCoupon.discountType === 'PERCENTAGE') {
+          discountAmount = Math.round(subtotal * Number(userCoupon.discountValue) / 100)
+        } else {
+          discountAmount = Number(userCoupon.discountValue)
+        }
+        return NextResponse.json({
+          valid: true,
+          coupon: {
+            code: userCoupon.code,
+            discountType: userCoupon.discountType,
+            discountValue: Number(userCoupon.discountValue),
+            discountAmount,
+            description: userCoupon.description,
+            isUserCoupon: true,
+          },
+        })
+      }
+    }
 
     if (!coupon) {
       return NextResponse.json(

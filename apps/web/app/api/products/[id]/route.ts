@@ -12,7 +12,7 @@ export async function GET(
     const product = await prisma.product.findUnique({
       where: { id },
       include: {
-        category: true,
+        categories: true,
         variants: {
           where: { isActive: true },
         },
@@ -62,26 +62,33 @@ export async function PUT(
       slug,
       description,
       shortDesc,
-      categoryId,
+      categoryIds,
       isActive,
       isFeatured,
       sortOrder,
     } = body
 
+    const updateData: any = {
+      name,
+      slug,
+      description,
+      shortDesc,
+      isActive,
+      isFeatured,
+      sortOrder,
+    }
+
+    if (categoryIds) {
+      updateData.categories = {
+        set: categoryIds.map((id: string) => ({ id })),
+      }
+    }
+
     const product = await prisma.product.update({
       where: { id },
-      data: {
-        name,
-        slug,
-        description,
-        shortDesc,
-        categoryId,
-        isActive,
-        isFeatured,
-        sortOrder,
-      },
+      data: updateData,
       include: {
-        category: true,
+        categories: true,
         variants: true,
         images: true,
       },
