@@ -15,8 +15,6 @@ const supraAdsApiUrl =
     ''
   )
 const supraAdsScriptUrl = `${supraAdsApiUrl}/widget/chatbot.js`
-const supraAdsIntegrity =
-  'sha384-bfvSb2ZBfMs4i6tQfhwG18XEU6MAAO4MdmfXRnk+8A70TceY/WYyf2Xzel+e9j1t'
 
 export const metadata: Metadata = {
   title: 'Symphony eCommerce - Premium Gifting Solutions for Every Occasion',
@@ -60,8 +58,6 @@ export default function RootLayout({
                 var s = document.createElement('script');
                 s.src = ${JSON.stringify(supraAdsScriptUrl)};
                 s.async = true;
-                s.integrity = ${JSON.stringify(supraAdsIntegrity)};
-                s.crossOrigin = 'anonymous';
                 s.dataset.siteId = ${JSON.stringify(supraAdsSiteId)};
                 s.dataset.apiUrl = ${JSON.stringify(supraAdsApiUrl)};
                 document.head.appendChild(s);
