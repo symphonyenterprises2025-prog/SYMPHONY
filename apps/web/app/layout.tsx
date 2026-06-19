@@ -7,15 +7,16 @@ import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' })
-const supraAdsChatbotEnabled =
-  process.env.NEXT_PUBLIC_SUPRAADS_CHATBOT_ENABLED === 'true'
-const supraAdsSiteId = process.env.NEXT_PUBLIC_SUPRAADS_SITE_ID
+const supraAdsSiteId =
+  process.env.NEXT_PUBLIC_SUPRAADS_SITE_ID || '8a32d53d3946'
 const supraAdsApiUrl =
   (process.env.NEXT_PUBLIC_SUPRAADS_API_URL || 'https://bot.supraads.in').replace(
     /\/$/,
     ''
   )
 const supraAdsScriptUrl = `${supraAdsApiUrl}/widget/chatbot.js`
+const supraAdsIntegrity =
+  'sha384-bfvSb2ZBfMs4i6tQfhwG18XEU6MAAO4MdmfXRnk+8A70TceY/WYyf2Xzel+e9j1t'
 
 export const metadata: Metadata = {
   title: 'Symphony eCommerce - Premium Gifting Solutions for Every Occasion',
@@ -50,24 +51,24 @@ export default function RootLayout({
         {children}
         <Toaster />
         <WhatsAppChat />
-        {supraAdsChatbotEnabled && supraAdsSiteId ? (
-          <Script
-            id="supraads-chatbot-embed"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function() {
-                  var s = document.createElement('script');
-                  s.src = ${JSON.stringify(supraAdsScriptUrl)};
-                  s.async = true;
-                  s.dataset.siteId = ${JSON.stringify(supraAdsSiteId)};
-                  s.dataset.apiUrl = ${JSON.stringify(supraAdsApiUrl)};
-                  document.head.appendChild(s);
-                })();
-              `,
-            }}
-          />
-        ) : null}
+        <Script
+          id="supraads-chatbot-embed"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var s = document.createElement('script');
+                s.src = ${JSON.stringify(supraAdsScriptUrl)};
+                s.async = true;
+                s.integrity = ${JSON.stringify(supraAdsIntegrity)};
+                s.crossOrigin = 'anonymous';
+                s.dataset.siteId = ${JSON.stringify(supraAdsSiteId)};
+                s.dataset.apiUrl = ${JSON.stringify(supraAdsApiUrl)};
+                document.head.appendChild(s);
+              })();
+            `,
+          }}
+        />
       </body>
     </html>
   )
