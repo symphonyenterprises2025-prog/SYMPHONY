@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 import { WhatsAppChat } from '@/components/storefront/whatsapp-chat'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' })
@@ -40,7 +41,17 @@ export default function RootLayout({
         {children}
         <Toaster />
         <WhatsAppChat />
+        
+        {/* SupraAds Chatbot Widget */}
+        <Script
+          id="supraads-chatbot"
+          src="https://bot.supraads.in/widget/chatbot.js"
+          strategy="afterInteractive"
+          data-site-id="8a32d53d3946"
+          data-api-url="https://bot.supraads.in"
+        />
       </body>
     </html>
   )
 }
+
