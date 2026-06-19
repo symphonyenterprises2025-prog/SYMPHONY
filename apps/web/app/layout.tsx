@@ -41,17 +41,24 @@ export default function RootLayout({
         {children}
         <Toaster />
         <WhatsAppChat />
-        
         {/* SupraAds Chatbot Widget */}
         <Script
-          id="supraads-chatbot"
-          src="https://bot.supraads.in/widget/chatbot.js"
+          id="supraads-chatbot-embed"
           strategy="afterInteractive"
-          data-site-id="8a32d53d3946"
-          data-api-url="https://bot.supraads.in"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var s = document.createElement('script');
+                s.src = 'https://bot.supraads.in/widget/chatbot.js';
+                s.async = true;
+                s.dataset.siteId = '8a32d53d3946';
+                s.dataset.apiUrl = 'https://bot.supraads.in';
+                document.head.appendChild(s);
+              })();
+            `,
+          }}
         />
       </body>
     </html>
   )
 }
-
