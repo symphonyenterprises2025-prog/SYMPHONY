@@ -124,6 +124,7 @@ export default function CheckoutPage() {
         variantId: item.variantId,
         productName: item.name,
         variantName: item.variant,
+        quantity: item.quantity,
         customization: item.customization,
         addOns: item.addOns?.map((a) => ({
           id: a.addOnId,

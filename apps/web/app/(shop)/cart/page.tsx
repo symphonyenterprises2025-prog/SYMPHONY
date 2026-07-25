@@ -20,6 +20,7 @@ interface CartItem {
   quantity: number;
   image: string;
   variant: string;
+  customization?: { text?: string } | null;
 }
 
 export default function CartPage() {
@@ -48,6 +49,7 @@ export default function CartPage() {
             quantity: item.quantity,
             image: item.product?.images?.[0]?.url || item.image || "/images/collections/gift-hampers.jpg",
             variant: item.variant?.name || item.variantName || "Standard",
+            customization: item.customization ?? null,
           })));
         }
       }
@@ -174,6 +176,12 @@ export default function CartPage() {
                             {item.name}
                           </h2>
                           <p className="mt-2 text-sm text-slate-500">{item.variant}</p>
+                          {item.customization?.text && (
+                            <p className="mt-2 text-sm text-[#8d6a2f]">
+                              <span className="font-semibold">Personalized: </span>
+                              &ldquo;{item.customization.text}&rdquo;
+                            </p>
+                          )}
                           <p className="mt-3 text-sm font-semibold text-[#1f3763] lg:hidden">
                             ₹{item.price * item.quantity}
                           </p>

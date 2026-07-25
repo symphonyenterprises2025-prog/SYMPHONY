@@ -5,6 +5,34 @@ import { authOptions } from '@/lib/auth'
 import { sendTransactionalEmail, sendAdminNotification } from '@/lib/email/brevo'
 import { getOrderConfirmationTemplate } from '@/lib/email/templates'
 import type { Order, OrderItem, Address } from '@prisma/client'
+import { z } from 'zod'
+
+// Validate the payload up front. Previously a missing `quantity` flowed
+// straight through to Prisma (price * undefined = NaN) and surfaced as an
+// opaque 500; now it fails fast with a message the client can show.
+const orderItemSchema = z.object({
+  productId: z.string().min(1),
+  variantId: z.string().min(1),
+  quantity: z.number().int().min(1, 'Quantity must be at least 1'),
+  productName: z.string().optional(),
+  variantName: z.string().optional(),
+  productData: z.unknown().optional(),
+  customization: z.unknown().optional(),
+  addOns: z.unknown().optional(),
+})
+
+const createOrderSchema = z.object({
+  customerEmail: z.string().email('A valid email address is required'),
+  customerName: z.string().min(1, 'Customer name is required'),
+  customerPhone: z.string().optional(),
+  items: z.array(orderItemSchema).min(1, 'Order must contain at least one item'),
+  shippingAddress: z.record(z.any()).optional(),
+  notes: z.string().optional(),
+  giftMessage: z.string().optional(),
+  isGiftWrapped: z.boolean().optional().default(false),
+  couponCode: z.string().optional(),
+  paymentMethod: z.string().optional(),
+})
 
 class OrderError extends Error {
   status: number
@@ -81,14 +109,29 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in to place an order' },
         { status: 401 }
       )
     }
 
-    const body = await request.json()
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
+
+    const parsed = createOrderSchema.safeParse(rawBody)
+    if (!parsed.success) {
+      const issue = parsed.error.issues?.[0]
+      return NextResponse.json(
+        { error: issue?.message ?? 'Invalid order payload' },
+        { status: 400 }
+      )
+    }
+
     const {
       customerEmail,
       customerName,
@@ -99,14 +142,8 @@ export async function POST(request: NextRequest) {
       giftMessage,
       isGiftWrapped,
       couponCode,
-    } = body
-
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json(
-        { error: 'Order must contain at least one item' },
-        { status: 400 }
-      )
-    }
+      paymentMethod,
+    } = parsed.data
 
     // Look up variant prices from database (server-side)
     const variantIds = items.map((item: any) => item.variantId)
@@ -270,6 +307,10 @@ export async function POST(request: NextRequest) {
             giftMessage,
             isGiftWrapped,
             status: 'PENDING',
+            // Without this the order is orphaned: orders.userId stays NULL,
+            // so /api/orders/my finds nothing and the customer never sees
+            // the order they just placed.
+            user: { connect: { id: session.user.id } },
             ...(couponId ? { coupon: { connect: { id: couponId } } } : {}),
             items: { create: orderItemsData },
             address: shippingAddress ? {
@@ -282,11 +323,24 @@ export async function POST(request: NextRequest) {
                 postalCode: shippingAddress.postalCode || shippingAddress.pincode || '',
                 country: 'India',
                 phone: customerPhone,
-                user: { connect: { id: session.user?.id } },
+                user: { connect: { id: session.user.id } },
               },
             } : undefined,
           },
           include: { items: true, address: true },
+        })
+
+        // Every order needs a payment row or the payments table stays empty
+        // and revenue reporting is blank. COD is pending until delivery.
+        await tx.payment.create({
+          data: {
+            orderId: newOrder.id,
+            provider: 'COD',
+            amount: total,
+            currency: 'INR',
+            status: 'PENDING',
+            paymentMethod: paymentMethod || 'Cash on Delivery',
+          },
         })
 
         return newOrder

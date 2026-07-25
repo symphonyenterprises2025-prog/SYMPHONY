@@ -9,6 +9,9 @@ const addToCartSchema = z.object({
   variantId: z.string().min(1, "Variant ID is required"),
   quantity: z.number().int().min(1).default(1),
   addOnIds: z.array(z.string()).default([]),
+  customization: z
+    .object({ text: z.string().trim().min(1).max(200) })
+    .optional(),
 })
 
 export async function GET(request: NextRequest) {
@@ -76,7 +79,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { productId, variantId, quantity, addOnIds } = result.data
+    const { productId, variantId, quantity, addOnIds, customization } = result.data
 
     // Get or create cart
     let cart = await prisma.cart.findUnique({
@@ -102,7 +105,13 @@ export async function POST(request: NextRequest) {
     if (existingItem) {
       await prisma.cartItem.update({
         where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity },
+        data: {
+          quantity: existingItem.quantity + quantity,
+          // cart_items is unique on (cartId, variantId), so re-adding the
+          // same variant merges into one line. Keep the latest text rather
+          // than silently discarding what the customer just typed.
+          ...(customization ? { customization } : {}),
+        },
       })
       // Update add-ons: delete existing, add new
       await prisma.cartItemAddOn.deleteMany({ where: { cartItemId: existingItem.id } })
@@ -125,6 +134,7 @@ export async function POST(request: NextRequest) {
           productId,
           variantId,
           quantity,
+          ...(customization ? { customization } : {}),
           addOns: addOnIds.length > 0
             ? {
                 create: await (async () => {

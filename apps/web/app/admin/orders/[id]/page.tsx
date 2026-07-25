@@ -124,6 +124,14 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                     <div className="flex-1">
                       <p className="font-medium">{item.productName}</p>
                       <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                      {(item.customization as { text?: string } | null)?.text && (
+                        <p className="mt-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm">
+                          <span className="font-semibold text-amber-900">Personalize: </span>
+                          <span className="text-amber-900">
+                            {(item.customization as { text?: string }).text}
+                          </span>
+                        </p>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className="font-medium">₹{Number(item.price).toFixed(2)}</p>

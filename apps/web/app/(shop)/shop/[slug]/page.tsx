@@ -25,6 +25,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [addedToCart, setAddedToCart] = useState(false);
   const [addedToWishlist, setAddedToWishlist] = useState(false);
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+  const [customText, setCustomText] = useState("");
+  const [customError, setCustomError] = useState("");
   const [product, setProduct] = useState<any>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -64,6 +66,15 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       : [{ id: "fallback", url: mainImage, alt: product.name }];
 
   const handleAddToCart = async () => {
+    setCustomError("");
+
+    // Personalized products are useless to fulfil without the text, so
+    // block the add rather than silently shipping a blank engraving.
+    if (product.hasCustomization && !customText.trim()) {
+      setCustomError("Please enter the text you'd like personalized.");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/cart", {
@@ -74,16 +85,24 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           variantId: firstVariant.id,
           quantity,
           addOnIds: selectedAddOns,
+          ...(product.hasCustomization
+            ? { customization: { text: customText.trim() } }
+            : {}),
         }),
       });
 
       if (res.ok) {
         setAddedToCart(true);
         setSelectedAddOns([]);
+        setCustomText("");
         setTimeout(() => setAddedToCart(false), 2000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setCustomError(data.error || "Could not add this item to your cart.");
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
+      setCustomError("Could not add this item to your cart. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -301,23 +320,31 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </p>
                   <div className="mt-4 space-y-3">
                     <div>
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Custom Text</label>
+                      <label htmlFor="customText" className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                        Custom Text
+                      </label>
                       <input
+                        id="customText"
                         type="text"
+                        maxLength={200}
+                        value={customText}
+                        onChange={(e) => {
+                          setCustomText(e.target.value);
+                          if (customError) setCustomError("");
+                        }}
                         placeholder="Enter your text here..."
                         className="mt-1 flex h-10 w-full rounded-lg border border-[#eadfca] bg-white px-3 py-2 text-sm outline-none focus:border-[#c59a46] focus:ring-1 focus:ring-[#c59a46]"
                       />
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Upload Image (optional)</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="mt-1 block w-full text-sm text-slate-500 file:mr-3 file:rounded-full file:border-0 file:bg-[#1f3763] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-[#172c53]"
-                      />
+                      <p className="mt-1 text-xs text-slate-500">
+                        This is what we engrave or print. {200 - customText.length} characters left.
+                      </p>
                     </div>
                   </div>
                 </div>
+              )}
+
+              {customError && (
+                <p className="mt-3 text-sm text-red-600">{customError}</p>
               )}
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">

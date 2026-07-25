@@ -24,7 +24,7 @@ function emailNotConfiguredResponse() {
   return NextResponse.json(
     {
       error:
-        'Email service is not configured on this server. Please contact support@your-domain.com.',
+        'Email service is not configured on this server. Please contact info@symphonyenterprise.co.in.',
     },
     { status: 503 }
   )
