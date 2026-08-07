@@ -61,6 +61,44 @@ export function getOTPEmailTemplate(otp: string, name: string): string {
   `
 }
 
+export function getPasswordResetOTPTemplate(otp: string, name: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password - Symphony Enterprise</title>
+  ${styles}
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Symphony Enterprise</h1>
+      <p>Premium Gifting &amp; Personalization</p>
+    </div>
+    <div class="content">
+      <h2>Hi ${name},</h2>
+      <p>We received a request to reset the password for your Symphony Enterprise account. Use the code below to set a new password:</p>
+
+      <div class="otp-box">
+        <p class="otp-label">Your Password Reset Code</p>
+        <p class="otp-code">${otp}</p>
+      </div>
+
+      <p>This code will expire in <strong>10 minutes</strong>. Please do not share it with anyone &mdash; our team will never ask you for it.</p>
+      <p><strong>If you did not request a password reset</strong>, you can safely ignore this email. Your password will not change until someone enters this code.</p>
+    </div>
+    <div class="footer">
+      <p>&copy; ${new Date().getFullYear()} Symphony Enterprise. All rights reserved.</p>
+      <p>Siripur Market, Unit-8, Bhubaneswar, Odisha 751003</p>
+    </div>
+  </div>
+</body>
+</html>
+  `
+}
+
 export function getWelcomeEmailTemplate(name: string): string {
   return `
 <!DOCTYPE html>

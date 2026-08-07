@@ -20,6 +20,9 @@ export function LoginContent() {
   const [loading, setLoading] = useState(false);
 
   const callbackUrl = searchParams.get("callbackUrl") || "/account";
+  // Set by /forgot-password on success, so the user gets confirmation rather
+  // than being dropped on a bare login form wondering if it worked.
+  const justReset = searchParams.get("reset") === "true";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,6 +63,11 @@ export function LoginContent() {
               <h2 className="font-sans text-[2rem] font-semibold text-slate-950">Account Login</h2>
               <p className="mt-2 font-sans text-[1rem] text-slate-600">Use your registered credentials to enter the storefront.</p>
               <form onSubmit={onSubmit} className="mt-8 space-y-5">
+                {justReset && !error ? (
+                  <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                    Your password has been reset. Sign in with your new password.
+                  </div>
+                ) : null}
                 {error ? <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div> : null}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -69,7 +77,15 @@ export function LoginContent() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm font-semibold text-[#1f3763] hover:text-[#172c53]"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <div className="relative">
                     <LockKeyhole className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <PasswordInput id="password" name="password" className="h-12 rounded-xl border-[#e6dbc4] pl-11" required />
