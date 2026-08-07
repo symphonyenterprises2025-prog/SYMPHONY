@@ -1,6 +1,12 @@
 import { withAuth } from "next-auth/middleware"
 
 export default withAuth({
+  // withAuth does not read pages.signIn from authOptions, so without this it
+  // bounces through /api/auth/signin, which then forwards to /login -- two
+  // redirects instead of one. Naming it here sends users straight to /login.
+  pages: {
+    signIn: '/login',
+  },
   callbacks: {
     authorized: ({ token }) => !!token,
   },
