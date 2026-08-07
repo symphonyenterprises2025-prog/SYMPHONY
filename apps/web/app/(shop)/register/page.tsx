@@ -12,6 +12,22 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { StorefrontCanvas, StorefrontContainer } from "@/components/storefront/brand-system";
 
+/**
+ * Carry any ?callbackUrl= through to the login page, so someone who started
+ * from a product page lands back there after signing in rather than on
+ * /account. Read from window (handlers only, never during render) to avoid
+ * pulling useSearchParams in, which would need its own Suspense boundary.
+ */
+function loginUrlWithCallback(status: string): string {
+  const callbackUrl =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("callbackUrl")
+      : null;
+  return callbackUrl
+    ? `/login?${status}&callbackUrl=${encodeURIComponent(callbackUrl)}`
+    : `/login?${status}`;
+}
+
 interface RegistrationData {
   name: string;
   email: string;
@@ -76,7 +92,7 @@ export default function RegisterPage() {
         setStep("verify");
         setResendTimer(60);
       } else {
-        router.push("/login?registered=true");
+        router.push(loginUrlWithCallback("registered=true"));
       }
     } catch (err: any) {
       setError(err.message || "Registration failed");
@@ -113,7 +129,7 @@ export default function RegisterPage() {
         throw new Error(data.error || "Verification failed");
       }
 
-      router.push("/login?verified=true");
+      router.push(loginUrlWithCallback("verified=true"));
     } catch (err: any) {
       setError(err.message || "Verification failed");
     } finally {

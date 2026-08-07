@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "@/components/ui/safe-link";
 import { Minus, Plus, RefreshCw, Shield, Star, Truck, Heart } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ProductReviews } from "@/components/storefront/product-reviews";
@@ -19,6 +19,7 @@ import {
 } from "@/components/storefront/brand-system";
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const pathname = usePathname();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [customText, setCustomText] = useState("");
   const [customError, setCustomError] = useState("");
+  // Set when the cart API rejects us for being logged out, so we can offer a
+  // sign-in link instead of surfacing the raw "Unauthorized" string.
+  const [needsLogin, setNeedsLogin] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -67,6 +71,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   const handleAddToCart = async () => {
     setCustomError("");
+    setNeedsLogin(false);
 
     // Personalized products are useless to fulfil without the text, so
     // block the add rather than silently shipping a blank engraving.
@@ -96,6 +101,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         setSelectedAddOns([]);
         setCustomText("");
         setTimeout(() => setAddedToCart(false), 2000);
+      } else if (res.status === 401) {
+        // The cart is stored against a user row, so there is no guest cart.
+        // Say so plainly and give them a way through.
+        setNeedsLogin(true);
       } else {
         const data = await res.json().catch(() => ({}));
         setCustomError(data.error || "Could not add this item to your cart.");
@@ -109,6 +118,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   };
 
   const handleAddToWishlist = async () => {
+    setCustomError("");
+    setNeedsLogin(false);
     try {
       const res = await fetch("/api/wishlist", {
         method: "POST",
@@ -119,6 +130,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       if (res.ok) {
         setAddedToWishlist(true);
         setTimeout(() => setAddedToWishlist(false), 2000);
+      } else if (res.status === 401) {
+        // Wishlists are per-user too. This used to fail silently -- the heart
+        // simply never filled and the shopper got no explanation.
+        setNeedsLogin(true);
       }
     } catch (error) {
       console.error("Error adding to wishlist:", error);
@@ -345,6 +360,37 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
               {customError && (
                 <p className="mt-3 text-sm text-red-600">{customError}</p>
+              )}
+
+              {needsLogin && (
+                <div
+                  role="alert"
+                  className="mt-4 rounded-[1.2rem] border border-[#d0b57a] bg-[#fbf8f1] p-4 sm:p-5"
+                >
+                  <p className="text-sm font-semibold text-slate-950">
+                    Please sign in to continue
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    Your cart and wishlist are saved to your account, so you&apos;ll need to sign
+                    in before adding items.
+                  </p>
+                  {/* Stacked full-width on phones so both are easy thumb targets,
+                      side by side from sm up. h-11 keeps them >=44px tall. */}
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <Link
+                      href={`/login?callbackUrl=${encodeURIComponent(pathname)}`}
+                      className="inline-flex h-11 w-full items-center justify-center rounded-full bg-[#1f3763] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#16294a] sm:w-auto"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href={`/register?callbackUrl=${encodeURIComponent(pathname)}`}
+                      className="inline-flex h-11 w-full items-center justify-center rounded-full border border-[#d0b57a] bg-white px-6 text-sm font-semibold text-slate-700 transition-colors hover:bg-[#f8f2e5] sm:w-auto"
+                    >
+                      Create account
+                    </Link>
+                  </div>
+                </div>
               )}
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">

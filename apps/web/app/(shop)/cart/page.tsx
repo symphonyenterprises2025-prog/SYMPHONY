@@ -31,6 +31,9 @@ export default function CartPage() {
   const [discountCode, setDiscountCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
   const [discountAmount, setDiscountAmount] = useState(0);
+  // The cart lives against a user row, so a logged-out visitor gets a 401 and
+  // no items. Showing "your cart is empty" there reads as "we lost your cart".
+  const [signedOut, setSignedOut] = useState(false);
 
   useEffect(() => {
     fetchCart();
@@ -39,7 +42,9 @@ export default function CartPage() {
   async function fetchCart() {
     try {
       const res = await fetch("/api/cart");
-      if (res.ok) {
+      if (res.status === 401) {
+        setSignedOut(true);
+      } else if (res.ok) {
         const data = await res.json();
         if (data.items) {
           setCartItems(data.items.map((item: any) => ({
@@ -294,21 +299,54 @@ export default function CartPage() {
                 </Button>
               </aside>
             </section>
-          ) : (
-            <section className="mt-10 rounded-[2rem] border border-[#eadfca] bg-white p-10 text-center shadow-[0_24px_60px_rgba(45,36,20,0.1)]">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#f7f2e8] text-[#1f3763]">
-                <ShoppingBag className="h-9 w-9" />
+          ) : signedOut ? (
+            <section className="mt-10 rounded-[2rem] border border-[#eadfca] bg-white p-6 text-center shadow-[0_24px_60px_rgba(45,36,20,0.1)] sm:p-10">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#f7f2e8] text-[#1f3763] sm:h-20 sm:w-20">
+                <ShoppingBag className="h-8 w-8 sm:h-9 sm:w-9" />
               </div>
-              <h2 className="mt-6 font-sans text-[2rem] font-semibold text-slate-950">
+              <h2 className="mt-6 font-sans text-2xl font-semibold text-slate-950 sm:text-[2rem]">
+                Sign in to see your cart
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl font-sans text-[0.95rem] leading-7 text-slate-600 sm:text-[1rem]">
+                Your cart is saved to your account so it&apos;s waiting for you on any device.
+                Sign in to pick up where you left off.
+              </p>
+              <div className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
+                <Link
+                  href="/login?callbackUrl=%2Fcart"
+                  className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#1f3763] px-7 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#172c53] sm:w-auto"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register?callbackUrl=%2Fcart"
+                  className="inline-flex h-12 w-full items-center justify-center rounded-full border border-[#d0b57a] bg-white px-7 text-sm font-semibold uppercase tracking-wide text-slate-700 transition-colors hover:bg-[#f8f2e5] sm:w-auto"
+                >
+                  Create account
+                </Link>
+              </div>
+              <Link
+                href="/shop"
+                className="mt-5 inline-block text-sm font-semibold text-[#1f3763] underline underline-offset-4"
+              >
+                Continue browsing
+              </Link>
+            </section>
+          ) : (
+            <section className="mt-10 rounded-[2rem] border border-[#eadfca] bg-white p-6 text-center shadow-[0_24px_60px_rgba(45,36,20,0.1)] sm:p-10">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#f7f2e8] text-[#1f3763] sm:h-20 sm:w-20">
+                <ShoppingBag className="h-8 w-8 sm:h-9 sm:w-9" />
+              </div>
+              <h2 className="mt-6 font-sans text-2xl font-semibold text-slate-950 sm:text-[2rem]">
                 Your cart is empty
               </h2>
-              <p className="mx-auto mt-3 max-w-xl font-sans text-[1rem] leading-7 text-slate-600">
+              <p className="mx-auto mt-3 max-w-xl font-sans text-[0.95rem] leading-7 text-slate-600 sm:text-[1rem]">
                 Start with the catalog, collections, or personalized gifts section to build a cart
                 that fits the occasion.
               </p>
               <Button
                 asChild
-                className="mt-6 h-12 rounded-full bg-[#1f3763] px-7 text-sm font-semibold uppercase tracking-wide text-white hover:bg-[#172c53]"
+                className="mt-6 h-12 w-full rounded-full bg-[#1f3763] px-7 text-sm font-semibold uppercase tracking-wide text-white hover:bg-[#172c53] sm:w-auto"
               >
                 <Link href="/shop">Explore Products</Link>
               </Button>
