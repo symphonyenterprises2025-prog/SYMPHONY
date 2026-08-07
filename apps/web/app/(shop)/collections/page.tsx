@@ -27,6 +27,7 @@ const getCollectionImage = (slug: string): string => {
     'awards-recognition': '/images/collections/awards-recognition.jpg',
     'anniversary-stories': '/images/collections/anniversary-stories.jpg',
     'festival-specials': '/images/collections/festival-specials.jpg',
+    'rakhi': '/images/collections/rakhi.jpg',
   };
   return imageMap[slug] || '/images/collections/gift-hampers.jpg';
 };
@@ -37,7 +38,7 @@ export default async function CollectionsPage() {
   const collectionCards = collections.map((collection: Collection) => ({
     title: collection.name,
     description: collection.description || "",
-    image: getCollectionImage(collection.slug),
+    image: collection.image || getCollectionImage(collection.slug),
     href: `/collections/${collection.slug}`,
   }));
 
@@ -83,7 +84,7 @@ export default async function CollectionsPage() {
           <section className="mt-8">
             <BrandStats
               items={[
-                { value: "6", label: "featured collections" },
+                { value: String(collectionCards.length), label: "featured collections" },
                 { value: "2020", label: "brand legacy" },
                 { value: "50+", label: "delivery cities" },
                 { value: "Premium", label: "presentation focus" },

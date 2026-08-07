@@ -383,6 +383,17 @@ async function main() {
         sortOrder: 6,
       },
     }),
+    prisma.collection.upsert({
+      where: { slug: 'rakhi' },
+      update: {},
+      create: {
+        name: 'Rakhi',
+        slug: 'rakhi',
+        description: 'Rakhi thalis, sibling hampers, and personalized keepsakes for Raksha Bandhan.',
+        image: '/images/collections/rakhi.jpg',
+        sortOrder: 7,
+      },
+    }),
   ])
   console.log('✅ Collections created')
 
