@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
+import Link from "@/components/ui/safe-link";
 import { prisma } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { requireAdmin } from "@/lib/admin-auth";
+import { revalidateCollections } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +27,7 @@ async function createCollection(formData: FormData) {
     },
   });
 
+  revalidateCollections();
   redirect("/admin/collections");
 }
 
@@ -82,12 +85,8 @@ export default async function NewCollectionPage() {
             <Button type="submit">
               Create Collection
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => redirect("/admin/collections")}
-            >
-              Cancel
+            <Button type="button" variant="outline" asChild>
+              <Link href="/admin/collections">Cancel</Link>
             </Button>
           </div>
         </form>

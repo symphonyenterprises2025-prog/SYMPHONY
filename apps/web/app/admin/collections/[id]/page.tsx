@@ -1,10 +1,12 @@
 import { redirect, notFound } from "next/navigation";
+import Link from "@/components/ui/safe-link";
 import { prisma } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { requireAdmin } from "@/lib/admin-auth";
+import { revalidateCollections } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +31,7 @@ async function updateCollection(formData: FormData) {
     },
   });
 
+  revalidateCollections();
   redirect("/admin/collections");
 }
 
@@ -41,6 +44,7 @@ async function deleteCollection(formData: FormData) {
     where: { id },
   });
 
+  revalidateCollections();
   redirect("/admin/collections");
 }
 
@@ -122,12 +126,8 @@ export default async function EditCollectionPage({ params }: { params: Promise<{
             <Button type="submit">
               Update Collection
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => redirect("/admin/collections")}
-            >
-              Cancel
+            <Button type="button" variant="outline" asChild>
+              <Link href="/admin/collections">Cancel</Link>
             </Button>
           </div>
         </form>

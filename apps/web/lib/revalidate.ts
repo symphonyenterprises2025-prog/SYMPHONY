@@ -29,6 +29,7 @@ export function revalidateCollections() {
   revalidateTag(CACHE_TAGS.collections)
   revalidatePath('/')
   revalidatePath('/shop')
+  revalidatePath('/collections')
 }
 
 export function revalidateBanners() {
