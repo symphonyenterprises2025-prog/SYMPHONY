@@ -49,6 +49,8 @@ export async function createProduct(data: {
   description: string
   shortDesc?: string
   categoryIds: string[]
+  collectionIds?: string[]
+  occasionIds?: string[]
   isActive?: boolean
   isFeatured?: boolean
   hasCustomization?: boolean
@@ -60,6 +62,8 @@ export async function createProduct(data: {
   stock?: number
   sku?: string
 }) {
+  await requireAdmin()
+
   const product = await prisma.product.create({
     data: {
       name: data.name,
@@ -74,6 +78,12 @@ export async function createProduct(data: {
       socialProofLine2: data.socialProofLine2,
       categories: {
         connect: data.categoryIds.map(id => ({ id })),
+      },
+      collections: {
+        connect: (data.collectionIds ?? []).map(id => ({ id })),
+      },
+      occasions: {
+        connect: (data.occasionIds ?? []).map(id => ({ id })),
       },
       variants: {
         create: {
@@ -90,6 +100,8 @@ export async function createProduct(data: {
     include: {
       variants: true,
       categories: true,
+      collections: true,
+      occasions: true,
     },
   })
 
@@ -99,7 +111,7 @@ export async function createProduct(data: {
 
 export async function updateProduct(id: string, data: any) {
   await requireAdmin()
-  const { categoryIds, hasCustomization, customizationLabel, socialProofLine1, socialProofLine2, ...rest } = data
+  const { categoryIds, collectionIds, occasionIds, hasCustomization, customizationLabel, socialProofLine1, socialProofLine2, ...rest } = data
 
   const updateData: any = { ...rest }
   if (hasCustomization !== undefined) updateData.hasCustomization = hasCustomization
@@ -110,6 +122,21 @@ export async function updateProduct(id: string, data: any) {
   if (categoryIds && Array.isArray(categoryIds)) {
     updateData.categories = {
       set: categoryIds.map((id: string) => ({ id })),
+    }
+  }
+
+  // `set` replaces the whole relation, so only touch it when the caller
+  // actually sent the field. An undefined value means "leave as-is"; an
+  // empty array means "clear every link".
+  if (Array.isArray(collectionIds)) {
+    updateData.collections = {
+      set: collectionIds.map((id: string) => ({ id })),
+    }
+  }
+
+  if (Array.isArray(occasionIds)) {
+    updateData.occasions = {
+      set: occasionIds.map((id: string) => ({ id })),
     }
   }
 

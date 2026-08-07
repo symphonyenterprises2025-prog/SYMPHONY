@@ -8,9 +8,11 @@ export const dynamic = 'force-dynamic'
 export default async function NewProductPage() {
   await requireAdmin()
 
-  const categories = await prisma.category.findMany({
-    orderBy: { sortOrder: 'asc' }
-  })
+  const [categories, collections, occasions] = await Promise.all([
+    prisma.category.findMany({ orderBy: { sortOrder: 'asc' } }),
+    prisma.collection.findMany({ orderBy: { sortOrder: 'asc' } }),
+    prisma.occasion.findMany({ orderBy: { sortOrder: 'asc' } }),
+  ])
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -23,7 +25,7 @@ export default async function NewProductPage() {
 
       <Card>
         <CardContent className="pt-6">
-          <NewProductForm categories={categories} />
+          <NewProductForm categories={categories} collections={collections} occasions={occasions} />
         </CardContent>
       </Card>
     </div>

@@ -46,10 +46,14 @@ interface HistoryCounts {
 export function EditProductForm({
   product,
   categories,
+  collections = [],
+  occasions = [],
   historyCounts,
 }: {
   product: any & { images: ProductImage[]; variants: ProductVariant[] }
   categories: any[]
+  collections?: any[]
+  occasions?: any[]
   historyCounts: HistoryCounts
 }) {
   const router = useRouter()
@@ -128,6 +132,12 @@ export function EditProductForm({
     const categoryIds = categories
       .filter((_: any) => formData.get(`cat-${_.id}`) === 'on')
       .map((_: any) => _.id)
+    const collectionIds = collections
+      .filter((_: any) => formData.get(`col-${_.id}`) === 'on')
+      .map((_: any) => _.id)
+    const occasionIds = occasions
+      .filter((_: any) => formData.get(`occ-${_.id}`) === 'on')
+      .map((_: any) => _.id)
     const isActive = formData.get('isActive') === 'on'
     const isFeatured = formData.get('isFeatured') === 'on'
     const hasCustomization = formData.get('hasCustomization') === 'on'
@@ -147,6 +157,8 @@ export function EditProductForm({
         description,
         shortDesc,
         categoryIds,
+        collectionIds,
+        occasionIds,
         isActive,
         isFeatured,
         hasCustomization,
@@ -424,6 +436,44 @@ export function EditProductForm({
                 <label key={cat.id} className="flex items-center gap-2 text-sm cursor-pointer">
                   <Checkbox id={`cat-${cat.id}`} name={`cat-${cat.id}`} defaultChecked={checked} />
                   {cat.name}
+                </label>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Collections</Label>
+          <p className="text-xs text-muted-foreground">Controls which /collections pages this product appears on.</p>
+          <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+            {collections.length === 0 && (
+              <p className="text-sm text-muted-foreground col-span-2">No collections found. Create one first.</p>
+            )}
+            {collections.map((col) => {
+              const checked = product.collections?.some((pc: any) => pc.id === col.id)
+              return (
+                <label key={col.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox id={`col-${col.id}`} name={`col-${col.id}`} defaultChecked={checked} />
+                  {col.name}
+                </label>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Occasions</Label>
+          <p className="text-xs text-muted-foreground">Controls which /occasions pages this product appears on.</p>
+          <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+            {occasions.length === 0 && (
+              <p className="text-sm text-muted-foreground col-span-2">No occasions found. Create one first.</p>
+            )}
+            {occasions.map((occ) => {
+              const checked = product.occasions?.some((po: any) => po.id === occ.id)
+              return (
+                <label key={occ.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox id={`occ-${occ.id}`} name={`occ-${occ.id}`} defaultChecked={checked} />
+                  {occ.name}
                 </label>
               )
             })}

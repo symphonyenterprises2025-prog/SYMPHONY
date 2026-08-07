@@ -15,6 +15,8 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     where: { id },
     include: {
       categories: true,
+      collections: true,
+      occasions: true,
       images: {
         orderBy: { sortOrder: 'asc' }
       },
@@ -35,9 +37,11 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     notFound()
   }
 
-  const categories = await prisma.category.findMany({
-    orderBy: { sortOrder: 'asc' }
-  })
+  const [categories, collections, occasions] = await Promise.all([
+    prisma.category.findMany({ orderBy: { sortOrder: 'asc' } }),
+    prisma.collection.findMany({ orderBy: { sortOrder: 'asc' } }),
+    prisma.occasion.findMany({ orderBy: { sortOrder: 'asc' } }),
+  ])
 
   // Product has no back-relation for WishlistItem, so count separately.
   const wishlistCount = await prisma.wishlistItem.count({
@@ -58,6 +62,8 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           <EditProductForm
             product={product}
             categories={categories}
+            collections={collections}
+            occasions={occasions}
             historyCounts={{
               orderItems: product._count.orderItems,
               cartItems: product._count.cartItems,

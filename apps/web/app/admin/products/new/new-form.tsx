@@ -10,7 +10,15 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ImageIcon } from 'lucide-react'
 
-export function NewProductForm({ categories }: { categories: any[] }) {
+export function NewProductForm({
+  categories,
+  collections = [],
+  occasions = [],
+}: {
+  categories: any[]
+  collections?: any[]
+  occasions?: any[]
+}) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -27,6 +35,12 @@ export function NewProductForm({ categories }: { categories: any[] }) {
     const description = formData.get('description') as string
     const categoryIds = categories
       .filter((_: any) => formData.get(`cat-${_.id}`) === 'on')
+      .map((_: any) => _.id)
+    const collectionIds = collections
+      .filter((_: any) => formData.get(`col-${_.id}`) === 'on')
+      .map((_: any) => _.id)
+    const occasionIds = occasions
+      .filter((_: any) => formData.get(`occ-${_.id}`) === 'on')
       .map((_: any) => _.id)
     const price = parseFloat(formData.get('price') as string) || 0
     const comparePrice = parseFloat(formData.get('comparePrice') as string) || undefined
@@ -46,6 +60,8 @@ export function NewProductForm({ categories }: { categories: any[] }) {
         description,
         shortDesc,
         categoryIds,
+        collectionIds,
+        occasionIds,
         price,
         comparePrice,
         stock,
@@ -91,6 +107,38 @@ export function NewProductForm({ categories }: { categories: any[] }) {
             <label key={cat.id} className="flex items-center gap-2 text-sm cursor-pointer">
               <Checkbox id={`cat-${cat.id}`} name={`cat-${cat.id}`} />
               {cat.name}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Collections</Label>
+        <p className="text-xs text-muted-foreground">Controls which /collections pages this product appears on.</p>
+        <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+          {collections.length === 0 && (
+            <p className="text-sm text-muted-foreground col-span-2">No collections found. Create one first.</p>
+          )}
+          {collections.map(col => (
+            <label key={col.id} className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox id={`col-${col.id}`} name={`col-${col.id}`} />
+              {col.name}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Occasions</Label>
+        <p className="text-xs text-muted-foreground">Controls which /occasions pages this product appears on.</p>
+        <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+          {occasions.length === 0 && (
+            <p className="text-sm text-muted-foreground col-span-2">No occasions found. Create one first.</p>
+          )}
+          {occasions.map(occ => (
+            <label key={occ.id} className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox id={`occ-${occ.id}`} name={`occ-${occ.id}`} />
+              {occ.name}
             </label>
           ))}
         </div>
