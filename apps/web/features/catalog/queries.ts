@@ -103,10 +103,13 @@ export async function getCollections() {
         orderBy: { sortOrder: 'asc' },
       })
     },
-    ['collections'],
+    // Key is versioned so a deploy evicts any stale entry. Bump it whenever
+    // collections are changed outside the app (SQL/data migration), since
+    // nothing calls revalidateTag in that path.
+    ['collections', 'v2'],
     {
       tags: [CACHE_TAGS.collections],
-      revalidate: 3600,
+      revalidate: 300,
     }
   )()
 }
