@@ -390,7 +390,7 @@ async function main() {
         name: 'Rakhi',
         slug: 'rakhi',
         description: 'Rakhi thalis, sibling hampers, and personalized keepsakes for Raksha Bandhan.',
-        image: '/images/collections/rakhi.jpg',
+        image: '/images/collections/rakhi.png',
         sortOrder: 7,
       },
     }),

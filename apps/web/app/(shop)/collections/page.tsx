@@ -27,7 +27,7 @@ const getCollectionImage = (slug: string): string => {
     'awards-recognition': '/images/collections/awards-recognition.jpg',
     'anniversary-stories': '/images/collections/anniversary-stories.jpg',
     'festival-specials': '/images/collections/festival-specials.jpg',
-    'rakhi': '/images/collections/rakhi.jpg',
+    'rakhi': '/images/collections/rakhi.png',
   };
   return imageMap[slug] || '/images/collections/gift-hampers.jpg';
 };
